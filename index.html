@@ -8,54 +8,49 @@
 body {
     margin: 0;
     background: #87CEEB;
+    font-family: Arial Black, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    font-family: Arial Black, sans-serif;
-    overflow: hidden;
 }
 
-#startScreen {
+/* 공통 화면 */
+.screen {
     position: fixed;
     width: 100%;
     height: 100%;
-    background: linear-gradient(#8fd3f4, #84fab0);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 10;
 }
 
-#startScreen h1 {
-    font-size: 70px;
-    margin: 10px;
+/* 시작 화면 */
+#startScreen {
+    background: linear-gradient(#8fd3f4, #84fab0);
 }
 
-#startScreen p {
-    font-size: 26px;
-}
-
-#startBtn {
-    margin-top: 20px;
-    padding: 15px 40px;
-    font-size: 24px;
+button {
+    padding: 12px 35px;
+    font-size: 22px;
     font-weight: bold;
-    background: #ff6b6b;
+    margin: 10px;
+    border-radius: 12px;
     border: none;
-    border-radius: 15px;
     cursor: pointer;
 }
 
+/* 게임 */
 #game {
+    display: none;
     width: 100vw;
-    max-width: 1100px;
-    height: 420px;
+    max-width: 1200px;
+    height: 450px;
+    background: url("background.png") no-repeat center center;
+    background-size: cover;
     position: relative;
     overflow: hidden;
-    background: url("background.png") repeat-x;
-    background-position: 0 0;
     border-radius: 20px;
 }
 
@@ -79,67 +74,156 @@ body {
     color: white;
     text-shadow: 2px 2px 5px black;
 }
+
+/* 랭킹 */
+#rankingScreen {
+    display: none;
+    background: linear-gradient(#a1c4fd, #c2e9fb);
+}
+
+input {
+    padding: 10px;
+    font-size: 18px;
+    margin: 5px;
+}
+
+#rankingList {
+    margin-top: 20px;
+    width: 300px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.rankItem {
+    padding: 8px;
+    margin: 5px 0;
+    background: white;
+    border-radius: 8px;
+    font-size: 18px;
+}
+
+.highlight {
+    background: gold;
+    font-size: 22px;
+    font-weight: bold;
+    border: 3px solid red;
+}
 </style>
 </head>
 
 <body>
 
-<div id="startScreen">
-    <p>여자친구를 밟지 않게 조심하자!</p>
-    <h1>Juni Run</h1>
-    <button id="startBtn">시작하기</button>
+<!-- 시작 화면 -->
+<div id="startScreen" class="screen">
+    <h2>여자친구를 밟지 않게 조심하자!</h2>
+    <h1 style="font-size:70px;">Juni Run</h1>
+    <button onclick="startGame()">시작하기</button>
+    <button onclick="openRanking()">랭킹</button>
 </div>
 
+<!-- 게임 -->
 <div id="game">
-    <div id="scoreBoard">Time: 0s | Best: 0s</div>
+    <div id="scoreBoard">Time: 0s</div>
     <img id="juni" src="juni.png">
 </div>
 
-<script>
-let juni = document.getElementById("juni");
-let game = document.getElementById("game");
-let scoreBoard = document.getElementById("scoreBoard");
-let startScreen = document.getElementById("startScreen");
-let startBtn = document.getElementById("startBtn");
+<!-- 랭킹 화면 -->
+<div id="rankingScreen" class="screen">
+    <h1>랭킹</h1>
+    <input id="username" placeholder="이름">
+    <input id="password" placeholder="비밀번호(숫자만)" type="password" inputmode="numeric">
+    <button onclick="login()">확인</button>
+    <div id="rankingList"></div>
+    <button onclick="goBack()">Back</button>
+</div>
 
-let jumping = false;
+<script>
+let currentUser = null;
+let bestTime = 0;
 let time = 0;
-let best = localStorage.getItem("bestTime") || 0;
 let speed = 6;
 let gameOver = false;
-let obstacleInterval;
-let timerInterval;
-let bgPosition = 0;
+let obstacleInterval, timerInterval;
 
-startBtn.onclick = function() {
-    startScreen.style.display = "none";
-    startGame();
-};
+const game = document.getElementById("game");
+const juni = document.getElementById("juni");
+const scoreBoard = document.getElementById("scoreBoard");
 
-function jump() {
-    if (jumping || gameOver) return;
-    jumping = true;
-
-    let height = 0;
-    let up = setInterval(() => {
-        if (height >= 140) {
-            clearInterval(up);
-            let down = setInterval(() => {
-                if (height <= 0) {
-                    clearInterval(down);
-                    jumping = false;
-                }
-                height -= 7;
-                juni.style.bottom = height + "px";
-            }, 20);
-        }
-        height += 7;
-        juni.style.bottom = height + "px";
-    }, 20);
+/* 화면 전환 */
+function startGame(){
+    document.getElementById("startScreen").style.display="none";
+    game.style.display="block";
+    resetGame();
 }
 
-document.addEventListener("keydown", function(e){
-    if(e.code === "Space"){
+function openRanking(){
+    document.getElementById("startScreen").style.display="none";
+    document.getElementById("rankingScreen").style.display="flex";
+}
+
+function goBack(){
+    document.getElementById("rankingScreen").style.display="none";
+    document.getElementById("startScreen").style.display="flex";
+}
+
+/* 로그인 */
+function login(){
+    let name = document.getElementById("username").value.trim();
+    let pw = document.getElementById("password").value.trim();
+
+    if(!/^[0-9]+$/.test(pw)){
+        alert("비밀번호는 숫자만 가능합니다.");
+        return;
+    }
+
+    let users = JSON.parse(localStorage.getItem("users") || "{}");
+
+    if(users[name]){
+        if(users[name].pw !== pw){
+            alert("비밀번호가 틀렸습니다.");
+            return;
+        }
+    } else {
+        users[name] = { pw: pw, best: 0 };
+    }
+
+    currentUser = name;
+    bestTime = users[name].best;
+    localStorage.setItem("users", JSON.stringify(users));
+
+    showRanking();
+}
+
+/* 랭킹 표시 */
+function showRanking(){
+    let users = JSON.parse(localStorage.getItem("users") || "{}");
+    let arr = [];
+
+    for(let name in users){
+        arr.push({name:name, best:users[name].best});
+    }
+
+    arr.sort((a,b)=>b.best-a.best);
+
+    let list = document.getElementById("rankingList");
+    list.innerHTML="";
+
+    arr.forEach((u,i)=>{
+        let div = document.createElement("div");
+        div.className="rankItem";
+        div.innerHTML=(i+1)+"등 - "+u.name+" : "+u.best+"s";
+
+        if(u.name===currentUser){
+            div.classList.add("highlight");
+        }
+
+        list.appendChild(div);
+    });
+}
+
+/* 점프 */
+document.addEventListener("keydown", e=>{
+    if(e.code==="Space"){
         if(gameOver){
             resetGame();
         } else {
@@ -147,91 +231,88 @@ document.addEventListener("keydown", function(e){
         }
     }
 });
-document.addEventListener("touchstart", jump);
 
-/* 장애물 생성 */
-function createObstacle() {
+function jump(){
+    let height=0;
+    let up=setInterval(()=>{
+        if(height>=130){
+            clearInterval(up);
+            let down=setInterval(()=>{
+                if(height<=0){clearInterval(down);}
+                height-=6;
+                juni.style.bottom=height+"px";
+            },20);
+        }
+        height+=6;
+        juni.style.bottom=height+"px";
+    },20);
+}
 
-    let obstacle = document.createElement("img");
+/* 장애물 */
+function createObstacle(){
+    let obstacle=document.createElement("img");
 
-    // 30초 이후 보스 등장 확률
-    if(time >= 30 && Math.random() < 0.25){
-        obstacle.src = "obstacle2.png";  // 보스 이미지로 사용
-        obstacle.style.width = "110px";
+    if(time>=30 && Math.random()<0.25){
+        obstacle.src="obstacle2.png";
+        obstacle.style.width="110px";
     } else {
-        obstacle.src = "obstacle1.png";
-        obstacle.style.width = "60px";
+        obstacle.src="obstacle1.png";
+        obstacle.style.width="60px";
     }
 
-    obstacle.classList.add("obstacle");
-    obstacle.style.left = game.offsetWidth + "px";
+    obstacle.className="obstacle";
+    obstacle.style.left=game.offsetWidth+"px";
     game.appendChild(obstacle);
 
-    let move = setInterval(() => {
-        if(gameOver){
-            clearInterval(move);
-            return;
-        }
+    let move=setInterval(()=>{
+        if(gameOver){clearInterval(move);return;}
 
-        let juniRect = juni.getBoundingClientRect();
-        let obsRect = obstacle.getBoundingClientRect();
+        let jr=juni.getBoundingClientRect();
+        let or=obstacle.getBoundingClientRect();
 
-        if (
-            juniRect.right - 25 > obsRect.left + 20 &&
-            juniRect.left + 25 < obsRect.right - 20 &&
-            juniRect.bottom - 10 > obsRect.top + 10
-        ) {
-            obstacle.src = "obstacle2.png";
-            gameOver = true;
+        if(jr.right-20>or.left+15 && jr.left+20<or.right-15 && jr.bottom-10>or.top+10){
+            gameOver=true;
             clearInterval(obstacleInterval);
             clearInterval(timerInterval);
-            alert("보스에게 잡혔다 😭\n스페이스바로 재시작!");
+
+            saveScore();
+            alert("게임오버! 스페이스로 재시작");
         }
 
-        obstacle.style.left = obstacle.offsetLeft - speed + "px";
+        obstacle.style.left=obstacle.offsetLeft-speed+"px";
 
-        if (obstacle.offsetLeft < -120) {
+        if(obstacle.offsetLeft<-120){
             obstacle.remove();
             clearInterval(move);
         }
-    }, 20);
+    },20);
 }
 
-/* 게임 시작 */
-function startGame(){
-    gameOver = false;
-    time = 0;
-    speed = 6;
-    bgPosition = 0;
+/* 점수 저장 */
+function saveScore(){
+    if(!currentUser) return;
 
-    obstacleInterval = setInterval(createObstacle, 2000);
-
-    timerInterval = setInterval(() => {
-        time++;
-        speed += 0.2;   // 점점 빨라짐
-        scoreBoard.innerHTML = "Time: " + time + "s | Best: " + best + "s";
-
-        if(time > best){
-            best = time;
-            localStorage.setItem("bestTime", best);
-        }
-    }, 1000);
-
-    moveBackground();
+    let users=JSON.parse(localStorage.getItem("users"));
+    if(time>users[currentUser].best){
+        users[currentUser].best=time;
+        localStorage.setItem("users",JSON.stringify(users));
+    }
 }
 
-/* 배경 스크롤 */
-function moveBackground(){
-    if(gameOver) return;
-    bgPosition -= speed;
-    game.style.backgroundPosition = bgPosition + "px 0";
-    requestAnimationFrame(moveBackground);
-}
-
-/* 재시작 */
+/* 게임 리셋 */
 function resetGame(){
-    document.querySelectorAll(".obstacle").forEach(o => o.remove());
-    startGame();
+    document.querySelectorAll(".obstacle").forEach(o=>o.remove());
+    gameOver=false;
+    time=0;
+    speed=6;
+    scoreBoard.innerHTML="Time: 0s";
+
+    obstacleInterval=setInterval(createObstacle,2000);
+    timerInterval=setInterval(()=>{
+        time++;
+        speed+=0.2;
+        scoreBoard.innerHTML="Time: "+time+"s";
+    },1000);
 }
 </script>
 
