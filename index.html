@@ -7,14 +7,13 @@
 <style>
 body {
     margin: 0;
+    overflow: hidden;
     font-family: Arial Black, sans-serif;
-    text-align: center;
-    background: #87CEEB;
 }
 
 /* 시작 화면 */
 #startScreen {
-    position: absolute;
+    position: fixed;
     width: 100%;
     height: 100%;
     background: linear-gradient(#8fd3f4, #84fab0);
@@ -26,12 +25,12 @@ body {
 }
 
 #startScreen h1 {
-    font-size: 60px;
+    font-size: 70px;
     margin: 10px;
 }
 
 #startScreen p {
-    font-size: 24px;
+    font-size: 26px;
 }
 
 #startBtn {
@@ -46,33 +45,35 @@ body {
 }
 
 #game {
-    width: 100%;
-    max-width: 900px;
+    width: 100vw;
     height: 350px;
-    margin: auto;
-    overflow: hidden;
     position: relative;
+    overflow: hidden;
     background: url("background.png") repeat-x;
     background-size: cover;
-    display: none;
 }
 
 #juni {
     width: 80px;
     position: absolute;
     bottom: 0;
-    left: 50px;
+    left: 80px;
 }
 
 .obstacle {
-    width: 80px;
+    width: 60px;
     position: absolute;
     bottom: 0;
 }
 
 #score {
-    font-size: 20px;
+    position: fixed;
+    top: 10px;
+    left: 20px;
+    font-size: 22px;
     font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 4px black;
 }
 </style>
 </head>
@@ -85,13 +86,11 @@ body {
     <button id="startBtn">시작하기</button>
 </div>
 
-<h2 id="score">Score: 0 | Best: 0</h2>
+<div id="score">Score: 0</div>
 
 <div id="game">
     <img id="juni" src="juni.png">
 </div>
-
-<audio id="bgm" src="bgm.mp3" loop></audio>
 
 <script>
 let juni = document.getElementById("juni");
@@ -99,26 +98,25 @@ let game = document.getElementById("game");
 let scoreText = document.getElementById("score");
 let startScreen = document.getElementById("startScreen");
 let startBtn = document.getElementById("startBtn");
-let bgm = document.getElementById("bgm");
 
 let jumping = false;
 let score = 0;
 let best = localStorage.getItem("bestScore") || 0;
 let speed = 6;
+let gameOver = false;
+let obstacleInterval;
+let scoreInterval;
 
-scoreText.innerHTML = "Score: 0 | Best: " + best;
-
+/* 시작 버튼 */
 startBtn.onclick = function() {
     startScreen.style.display = "none";
-    game.style.display = "block";
-    bgm.play();
     startGame();
-}
+};
 
+/* 점프 */
 function jump() {
-    if (jumping) return;
+    if (jumping || gameOver) return;
     jumping = true;
-    juni.src = "juni_jump.png";
 
     let height = 0;
     let up = setInterval(() => {
@@ -128,66 +126,90 @@ function jump() {
                 if (height <= 0) {
                     clearInterval(down);
                     jumping = false;
-                    juni.src = "juni.png";
                 }
-                height -= 5;
+                height -= 6;
                 juni.style.bottom = height + "px";
             }, 20);
         }
-        height += 5;
+        height += 6;
         juni.style.bottom = height + "px";
     }, 20);
 }
 
-document.addEventListener("keydown", jump);
+document.addEventListener("keydown", function(e){
+    if(e.code === "Space"){
+        if(gameOver){
+            resetGame();
+        } else {
+            jump();
+        }
+    }
+});
 document.addEventListener("touchstart", jump);
 
+/* 장애물 생성 */
 function createObstacle() {
     let obstacle = document.createElement("img");
     obstacle.src = "obstacle1.png";
     obstacle.classList.add("obstacle");
-    obstacle.style.left = "900px";
+    obstacle.style.left = window.innerWidth + "px";
     game.appendChild(obstacle);
 
     let move = setInterval(() => {
+        if(gameOver){
+            clearInterval(move);
+            return;
+        }
+
         let juniRect = juni.getBoundingClientRect();
         let obsRect = obstacle.getBoundingClientRect();
 
+        /* 충돌 범위 축소 */
         if (
-            juniRect.right > obsRect.left &&
-            juniRect.left < obsRect.right &&
-            juniRect.bottom > obsRect.top
+            juniRect.right - 20 > obsRect.left + 15 &&
+            juniRect.left + 20 < obsRect.right - 15 &&
+            juniRect.bottom - 10 > obsRect.top + 10
         ) {
             obstacle.src = "obstacle2.png";
-            clearInterval(move);
-            alert("게임 오버 😭\n점수: " + score);
-            location.reload();
+            gameOver = true;
+            clearInterval(obstacleInterval);
+            clearInterval(scoreInterval);
+            alert("게임 오버 😭\n스페이스바를 눌러 다시 시작!");
         }
 
         obstacle.style.left = obstacle.offsetLeft - speed + "px";
 
-        if (obstacle.offsetLeft < -80) {
+        if (obstacle.offsetLeft < -60) {
             obstacle.remove();
             clearInterval(move);
         }
     }, 20);
 }
 
-function startGame() {
-    setInterval(() => {
-        createObstacle();
-    }, 2000);
+/* 게임 시작 */
+function startGame(){
+    gameOver = false;
+    score = 0;
+    speed = 6;
 
-    setInterval(() => {
+    obstacleInterval = setInterval(createObstacle, 2000);
+
+    scoreInterval = setInterval(() => {
         score++;
         speed += 0.02;
         scoreText.innerHTML = "Score: " + score + " | Best: " + best;
 
-        if (score > best) {
+        if(score > best){
             best = score;
             localStorage.setItem("bestScore", best);
         }
     }, 200);
+}
+
+/* 재시작 */
+function resetGame(){
+    document.querySelectorAll(".obstacle").forEach(o => o.remove());
+    startGame();
 }
 </script>
 
