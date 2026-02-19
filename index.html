@@ -256,12 +256,19 @@ document.addEventListener("keydown", e=>{
 });
 
 function jump(){
+    if(gameOver) return;
+
+    juni.src = "juni_jump.png";  
+
     let height=0;
     let up=setInterval(()=>{
         if(height>=130){
             clearInterval(up);
             let down=setInterval(()=>{
-                if(height<=0){clearInterval(down);}
+                if(height<=0){
+                    clearInterval(down);
+                    juni.src = "juni.png";
+                }
                 height-=6;
                 juni.style.bottom=height+"px";
             },20);
@@ -294,14 +301,20 @@ function createObstacle(){
         let or=obstacle.getBoundingClientRect();
 
         if(jr.right-20>or.left+15 && jr.left+20<or.right-15 && jr.bottom-10>or.top+10){
-            gameOver=true;
-            clearInterval(obstacleInterval);
-            clearInterval(timerInterval);
 
-            saveScore();
-            saveOnlineScore(currentUser, time);
-            alert("게임오버! 스페이스로 재시작");
-        }
+    obstacle.src = "obstacle2.png";  
+
+    gameOver=true;
+    clearInterval(obstacleInterval);
+    clearInterval(timerInterval);
+
+    saveScore();
+    saveOnlineScore(currentUser, time);
+
+    setTimeout(()=>{
+        alert("게임오버! 스페이스로 재시작");
+    },200);
+}
 
         obstacle.style.left=obstacle.offsetLeft-speed+"px";
 
