@@ -255,11 +255,21 @@ document.addEventListener("keydown", e=>{
     }
 });
 game.addEventListener("touchstart", function(e){
-    e.preventDefault();   
-    jump();
+    e.preventDefault();
+
+    if(gameOver){
+        resetGame(); 
+    } else {
+        jump();      
+    }
 });
 game.addEventListener("click", function(){
-    jump();
+
+    if(gameOver){
+        resetGame();
+    } else {
+        jump();
+    }
 });
 
 function jump(){
