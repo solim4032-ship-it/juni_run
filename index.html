@@ -86,6 +86,22 @@ input {
     font-size: 18px;
     margin: 5px;
 }
+#bestScoreBoard{
+    position:absolute;
+    top:50px;
+    left:20px;
+    font-size:22px;
+    color:white;
+    text-shadow:2px 2px 5px black;
+}
+
+#backBtn{
+    position:absolute;
+    top:15px;
+    right:20px;
+    font-size:18px;
+    padding:6px 15px;
+}
 
 #rankingList {
     margin-top: 20px;
@@ -124,6 +140,8 @@ input {
 <!-- 게임 -->
 <div id="game">
     <div id="scoreBoard">Time: 0s</div>
+    <div id="bestScoreBoard">Best: 0s</div>
+    <button id="backBtn" onclick="backToStart()">Back</button>
     <img id="juni" src="juni.png">
 </div>
 
@@ -148,11 +166,16 @@ let obstacleInterval, timerInterval;
 const game = document.getElementById("game");
 const juni = document.getElementById("juni");
 const scoreBoard = document.getElementById("scoreBoard");
+const bestScoreBoard = document.getElementById("bestScoreBoard");
+
 
 /* 화면 전환 */
 function startGame(){
     document.getElementById("startScreen").style.display="none";
     game.style.display="block";
+
+    bestScoreBoard.innerHTML = "Best: " + bestTime + "s";
+
     resetGame();
 }
 
@@ -295,9 +318,11 @@ function saveScore(){
 
     let users=JSON.parse(localStorage.getItem("users"));
     if(time>users[currentUser].best){
-        users[currentUser].best=time;
-        localStorage.setItem("users",JSON.stringify(users));
-    }
+    users[currentUser].best=time;
+    bestTime=time;
+    bestScoreBoard.innerHTML = "Best: " + bestTime + "s";
+    localStorage.setItem("users",JSON.stringify(users));
+}
 }
 
 /* 게임 리셋 */
@@ -315,19 +340,47 @@ function resetGame(){
         scoreBoard.innerHTML="Time: "+time+"s";
     },1000);
 }
+function backToStart(){
+    clearInterval(obstacleInterval);
+    clearInterval(timerInterval);
+    game.style.display="none";
+    document.getElementById("startScreen").style.display="flex";
+}
+    
 async function showOnlineRanking(){
     let rankingData = await loadOnlineRanking();
 
-    let html = "<h2>🏆 온라인 랭킹</h2>";
+    let bestScores = {};
 
-    rankingData.forEach((user, index)=>{
-        html += `<div>
-                    ${index+1}위 - ${user.name} : ${user.score}s
-                 </div>`;
+    rankingData.forEach(user=>{
+        if(!bestScores[user.name] || user.score > bestScores[user.name]){
+            bestScores[user.name] = user.score;
+        }
     });
 
-    document.getElementById("rankingList").innerHTML = html;
+    let finalArray = [];
+    for(let name in bestScores){
+        finalArray.push({name:name, score:bestScores[name]});
+    }
+
+    finalArray.sort((a,b)=>b.score-a.score);
+
+    let list = document.getElementById("rankingList");
+    list.innerHTML="<h2>🏆 온라인 랭킹</h2>";
+
+    finalArray.forEach((user,index)=>{
+        let div=document.createElement("div");
+        div.className="rankItem";
+        div.innerHTML=(index+1)+"등 - "+user.name+" : "+user.score+"s";
+
+        if(user.name===currentUser){
+            div.classList.add("highlight");
+        }
+
+        list.appendChild(div);
+    });
 }
+
     
 </script>
 
