@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Juni Run</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial Black, sans-serif;
+    text-align: center;
+    background: #87CEEB;
+}
+
+/* 시작 화면 */
+#startScreen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(#8fd3f4, #84fab0);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+#startScreen h1 {
+    font-size: 60px;
+    margin: 10px;
+}
+
+#startScreen p {
+    font-size: 24px;
+}
+
+#startBtn {
+    margin-top: 20px;
+    padding: 15px 40px;
+    font-size: 24px;
+    font-weight: bold;
+    background: #ff6b6b;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+#game {
+    width: 100%;
+    max-width: 900px;
+    height: 350px;
+    margin: auto;
+    overflow: hidden;
+    position: relative;
+    background: url("background.png") repeat-x;
+    background-size: cover;
+    display: none;
+}
+
+#juni {
+    width: 80px;
+    position: absolute;
+    bottom: 0;
+    left: 50px;
+}
+
+.obstacle {
+    width: 80px;
+    position: absolute;
+    bottom: 0;
+}
+
+#score {
+    font-size: 20px;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div id="startScreen">
+    <p>여자친구를 밟지 않게 조심하자!</p>
+    <h1>Juni Run</h1>
+    <button id="startBtn">시작하기</button>
+</div>
+
+<h2 id="score">Score: 0 | Best: 0</h2>
+
+<div id="game">
+    <img id="juni" src="juni.png">
+</div>
+
+<audio id="bgm" src="bgm.mp3" loop></audio>
+
+<script>
+let juni = document.getElementById("juni");
+let game = document.getElementById("game");
+let scoreText = document.getElementById("score");
+let startScreen = document.getElementById("startScreen");
+let startBtn = document.getElementById("startBtn");
+let bgm = document.getElementById("bgm");
+
+let jumping = false;
+let score = 0;
+let best = localStorage.getItem("bestScore") || 0;
+let speed = 6;
+
+scoreText.innerHTML = "Score: 0 | Best: " + best;
+
+startBtn.onclick = function() {
+    startScreen.style.display = "none";
+    game.style.display = "block";
+    bgm.play();
+    startGame();
+}
+
+function jump() {
+    if (jumping) return;
+    jumping = true;
+    juni.src = "juni_jump.png";
+
+    let height = 0;
+    let up = setInterval(() => {
+        if (height >= 120) {
+            clearInterval(up);
+            let down = setInterval(() => {
+                if (height <= 0) {
+                    clearInterval(down);
+                    jumping = false;
+                    juni.src = "juni.png";
+                }
+                height -= 5;
+                juni.style.bottom = height + "px";
+            }, 20);
+        }
+        height += 5;
+        juni.style.bottom = height + "px";
+    }, 20);
+}
+
+document.addEventListener("keydown", jump);
+document.addEventListener("touchstart", jump);
+
+function createObstacle() {
+    let obstacle = document.createElement("img");
+    obstacle.src = "obstacle1.png";
+    obstacle.classList.add("obstacle");
+    obstacle.style.left = "900px";
+    game.appendChild(obstacle);
+
+    let move = setInterval(() => {
+        let juniRect = juni.getBoundingClientRect();
+        let obsRect = obstacle.getBoundingClientRect();
+
+        if (
+            juniRect.right > obsRect.left &&
+            juniRect.left < obsRect.right &&
+            juniRect.bottom > obsRect.top
+        ) {
+            obstacle.src = "obstacle2.png";
+            clearInterval(move);
+            alert("게임 오버 😭\n점수: " + score);
+            location.reload();
+        }
+
+        obstacle.style.left = obstacle.offsetLeft - speed + "px";
+
+        if (obstacle.offsetLeft < -80) {
+            obstacle.remove();
+            clearInterval(move);
+        }
+    }, 20);
+}
+
+function startGame() {
+    setInterval(() => {
+        createObstacle();
+    }, 2000);
+
+    setInterval(() => {
+        score++;
+        speed += 0.02;
+        scoreText.innerHTML = "Score: " + score + " | Best: " + best;
+
+        if (score > best) {
+            best = score;
+            localStorage.setItem("bestScore", best);
+        }
+    }, 200);
+}
+</script>
+
+</body>
+</html>
