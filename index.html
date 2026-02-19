@@ -191,7 +191,7 @@ function login(){
     bestTime = users[name].best;
     localStorage.setItem("users", JSON.stringify(users));
 
-    showRanking();
+    showOnlineRanking();
 }
 
 /* 랭킹 표시 */
@@ -276,6 +276,7 @@ function createObstacle(){
             clearInterval(timerInterval);
 
             saveScore();
+            saveOnlineScore(currentUser, time);
             alert("게임오버! 스페이스로 재시작");
         }
 
@@ -313,6 +314,56 @@ function resetGame(){
         speed+=0.2;
         scoreBoard.innerHTML="Time: "+time+"s";
     },1000);
+}
+async function showOnlineRanking(){
+    let rankingData = await loadOnlineRanking();
+
+    let html = "<h2>🏆 온라인 랭킹</h2>";
+
+    rankingData.forEach((user, index)=>{
+        html += `<div>
+                    ${index+1}위 - ${user.name} : ${user.score}s
+                 </div>`;
+    });
+
+    document.getElementById("rankingList").innerHTML = html;
+}
+    
+</script>
+
+    <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC-GTDH9GtM0lZOfgpAGwIzqUJPvy12C80",
+  authDomain: "juni-run.firebaseapp.com",
+  projectId: "juni-run",
+  storageBucket: "juni-run.firebasestorage.app",
+  messagingSenderId: "349465222596",
+  appId: "1:349465222596:web:05fa5296fa769e4d415891",
+  measurementId: "G-KSMBMZKC2N"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.saveOnlineScore = async function(name, score){
+    await addDoc(collection(db, "ranking"), {
+        name: name,
+        score: score,
+        created: Date.now()
+    });
+}
+
+window.loadOnlineRanking = async function(){
+    const q = query(collection(db, "ranking"), orderBy("score", "desc"));
+    const querySnapshot = await getDocs(q);
+    let result = [];
+    querySnapshot.forEach((doc) => {
+        result.push(doc.data());
+    });
+    return result;
 }
 </script>
 
