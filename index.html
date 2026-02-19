@@ -16,7 +16,6 @@ body {
     overflow: hidden;
 }
 
-/* 시작 화면 */
 #startScreen {
     position: fixed;
     width: 100%;
@@ -49,40 +48,29 @@ body {
     cursor: pointer;
 }
 
-/* 게임 컨테이너 */
-#gameWrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
-
 #game {
-    width: 100%;
-    max-width: 1000px;
-    height: 400px;
+    width: 100vw;
+    max-width: 1100px;
+    height: 420px;
     position: relative;
     overflow: hidden;
     background: url("background.png") repeat-x;
-    background-size: cover;
+    background-position: 0 0;
     border-radius: 20px;
 }
 
-/* 캐릭터 */
 #juni {
     width: 80px;
     position: absolute;
     bottom: 0;
-    left: 80px;
+    left: 100px;
 }
 
-/* 장애물 */
 .obstacle {
-    width: 60px;
     position: absolute;
     bottom: 0;
 }
 
-/* 점수 */
 #scoreBoard {
     position: absolute;
     top: 15px;
@@ -102,11 +90,9 @@ body {
     <button id="startBtn">시작하기</button>
 </div>
 
-<div id="gameWrapper">
-    <div id="game">
-        <div id="scoreBoard">Time: 0s | Best: 0s</div>
-        <img id="juni" src="juni.png">
-    </div>
+<div id="game">
+    <div id="scoreBoard">Time: 0s | Best: 0s</div>
+    <img id="juni" src="juni.png">
 </div>
 
 <script>
@@ -123,32 +109,31 @@ let speed = 6;
 let gameOver = false;
 let obstacleInterval;
 let timerInterval;
+let bgPosition = 0;
 
-/* 시작 버튼 */
 startBtn.onclick = function() {
     startScreen.style.display = "none";
     startGame();
 };
 
-/* 점프 */
 function jump() {
     if (jumping || gameOver) return;
     jumping = true;
 
     let height = 0;
     let up = setInterval(() => {
-        if (height >= 130) {
+        if (height >= 140) {
             clearInterval(up);
             let down = setInterval(() => {
                 if (height <= 0) {
                     clearInterval(down);
                     jumping = false;
                 }
-                height -= 6;
+                height -= 7;
                 juni.style.bottom = height + "px";
             }, 20);
         }
-        height += 6;
+        height += 7;
         juni.style.bottom = height + "px";
     }, 20);
 }
@@ -166,8 +151,18 @@ document.addEventListener("touchstart", jump);
 
 /* 장애물 생성 */
 function createObstacle() {
+
     let obstacle = document.createElement("img");
-    obstacle.src = "obstacle1.png";
+
+    // 30초 이후 보스 등장 확률
+    if(time >= 30 && Math.random() < 0.25){
+        obstacle.src = "obstacle2.png";  // 보스 이미지로 사용
+        obstacle.style.width = "110px";
+    } else {
+        obstacle.src = "obstacle1.png";
+        obstacle.style.width = "60px";
+    }
+
     obstacle.classList.add("obstacle");
     obstacle.style.left = game.offsetWidth + "px";
     game.appendChild(obstacle);
@@ -181,23 +176,21 @@ function createObstacle() {
         let juniRect = juni.getBoundingClientRect();
         let obsRect = obstacle.getBoundingClientRect();
 
-        /* 충돌 범위 축소 */
         if (
-            juniRect.right - 20 > obsRect.left + 15 &&
-            juniRect.left + 20 < obsRect.right - 15 &&
+            juniRect.right - 25 > obsRect.left + 20 &&
+            juniRect.left + 25 < obsRect.right - 20 &&
             juniRect.bottom - 10 > obsRect.top + 10
         ) {
             obstacle.src = "obstacle2.png";
             gameOver = true;
             clearInterval(obstacleInterval);
             clearInterval(timerInterval);
-
-            alert("게임 오버 😭\n스페이스바를 눌러 다시 시작!");
+            alert("보스에게 잡혔다 😭\n스페이스바로 재시작!");
         }
 
         obstacle.style.left = obstacle.offsetLeft - speed + "px";
 
-        if (obstacle.offsetLeft < -60) {
+        if (obstacle.offsetLeft < -120) {
             obstacle.remove();
             clearInterval(move);
         }
@@ -209,12 +202,13 @@ function startGame(){
     gameOver = false;
     time = 0;
     speed = 6;
+    bgPosition = 0;
 
     obstacleInterval = setInterval(createObstacle, 2000);
 
     timerInterval = setInterval(() => {
         time++;
-        speed += 0.15;  // 🔥 점점 빨라짐 (체감 확실)
+        speed += 0.2;   // 점점 빨라짐
         scoreBoard.innerHTML = "Time: " + time + "s | Best: " + best + "s";
 
         if(time > best){
@@ -222,6 +216,16 @@ function startGame(){
             localStorage.setItem("bestTime", best);
         }
     }, 1000);
+
+    moveBackground();
+}
+
+/* 배경 스크롤 */
+function moveBackground(){
+    if(gameOver) return;
+    bgPosition -= speed;
+    game.style.backgroundPosition = bgPosition + "px 0";
+    requestAnimationFrame(moveBackground);
 }
 
 /* 재시작 */
