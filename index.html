@@ -254,6 +254,13 @@ document.addEventListener("keydown", e=>{
         }
     }
 });
+game.addEventListener("touchstart", function(e){
+    e.preventDefault();   
+    jump();
+});
+game.addEventListener("click", function(){
+    jump();
+});
 
 function jump(){
     if(gameOver) return;
