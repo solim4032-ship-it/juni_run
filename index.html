@@ -7,8 +7,13 @@
 <style>
 body {
     margin: 0;
-    overflow: hidden;
+    background: #87CEEB;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
     font-family: Arial Black, sans-serif;
+    overflow: hidden;
 }
 
 /* 시작 화면 */
@@ -44,15 +49,25 @@ body {
     cursor: pointer;
 }
 
+/* 게임 컨테이너 */
+#gameWrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
 #game {
-    width: 100vw;
-    height: 350px;
+    width: 100%;
+    max-width: 1000px;
+    height: 400px;
     position: relative;
     overflow: hidden;
     background: url("background.png") repeat-x;
     background-size: cover;
+    border-radius: 20px;
 }
 
+/* 캐릭터 */
 #juni {
     width: 80px;
     position: absolute;
@@ -60,20 +75,21 @@ body {
     left: 80px;
 }
 
+/* 장애물 */
 .obstacle {
     width: 60px;
     position: absolute;
     bottom: 0;
 }
 
-#score {
-    position: fixed;
-    top: 10px;
+/* 점수 */
+#scoreBoard {
+    position: absolute;
+    top: 15px;
     left: 20px;
-    font-size: 22px;
-    font-weight: bold;
+    font-size: 24px;
     color: white;
-    text-shadow: 2px 2px 4px black;
+    text-shadow: 2px 2px 5px black;
 }
 </style>
 </head>
@@ -86,26 +102,27 @@ body {
     <button id="startBtn">시작하기</button>
 </div>
 
-<div id="score">Score: 0</div>
-
-<div id="game">
-    <img id="juni" src="juni.png">
+<div id="gameWrapper">
+    <div id="game">
+        <div id="scoreBoard">Time: 0s | Best: 0s</div>
+        <img id="juni" src="juni.png">
+    </div>
 </div>
 
 <script>
 let juni = document.getElementById("juni");
 let game = document.getElementById("game");
-let scoreText = document.getElementById("score");
+let scoreBoard = document.getElementById("scoreBoard");
 let startScreen = document.getElementById("startScreen");
 let startBtn = document.getElementById("startBtn");
 
 let jumping = false;
-let score = 0;
-let best = localStorage.getItem("bestScore") || 0;
+let time = 0;
+let best = localStorage.getItem("bestTime") || 0;
 let speed = 6;
 let gameOver = false;
 let obstacleInterval;
-let scoreInterval;
+let timerInterval;
 
 /* 시작 버튼 */
 startBtn.onclick = function() {
@@ -120,7 +137,7 @@ function jump() {
 
     let height = 0;
     let up = setInterval(() => {
-        if (height >= 120) {
+        if (height >= 130) {
             clearInterval(up);
             let down = setInterval(() => {
                 if (height <= 0) {
@@ -152,7 +169,7 @@ function createObstacle() {
     let obstacle = document.createElement("img");
     obstacle.src = "obstacle1.png";
     obstacle.classList.add("obstacle");
-    obstacle.style.left = window.innerWidth + "px";
+    obstacle.style.left = game.offsetWidth + "px";
     game.appendChild(obstacle);
 
     let move = setInterval(() => {
@@ -173,7 +190,8 @@ function createObstacle() {
             obstacle.src = "obstacle2.png";
             gameOver = true;
             clearInterval(obstacleInterval);
-            clearInterval(scoreInterval);
+            clearInterval(timerInterval);
+
             alert("게임 오버 😭\n스페이스바를 눌러 다시 시작!");
         }
 
@@ -189,21 +207,21 @@ function createObstacle() {
 /* 게임 시작 */
 function startGame(){
     gameOver = false;
-    score = 0;
+    time = 0;
     speed = 6;
 
     obstacleInterval = setInterval(createObstacle, 2000);
 
-    scoreInterval = setInterval(() => {
-        score++;
-        speed += 0.02;
-        scoreText.innerHTML = "Score: " + score + " | Best: " + best;
+    timerInterval = setInterval(() => {
+        time++;
+        speed += 0.15;  // 🔥 점점 빨라짐 (체감 확실)
+        scoreBoard.innerHTML = "Time: " + time + "s | Best: " + best + "s";
 
-        if(score > best){
-            best = score;
-            localStorage.setItem("bestScore", best);
+        if(time > best){
+            best = time;
+            localStorage.setItem("bestTime", best);
         }
-    }, 200);
+    }, 1000);
 }
 
 /* 재시작 */
