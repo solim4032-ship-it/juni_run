@@ -3,136 +3,165 @@
 <head>
 <meta charset="UTF-8">
 <title>Juni World</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+
 <style>
-body{ margin:0; overflow:hidden; }
+body{
+    margin:0;
+    overflow:hidden;
+}
 
 /* ================= 공통 버튼 ================= */
+
 button{
-font-family:'Jua', sans-serif;
-padding:15px 40px;
-font-size:22px;
-border:none;
-border-radius:20px;
-cursor:pointer;
-background:white;
-transition:0.2s;
+    font-family:'Jua', sans-serif;
+    padding:15px 40px;
+    font-size:22px;
+    border:none;
+    border-radius:20px;
+    cursor:pointer;
+    background:white;
+    transition:0.2s;
 }
-button:hover{ transform:scale(1.1); }
+
+button:hover{
+    transform:scale(1.1);
+}
 
 /* ================= 시작화면 ================= */
+
 #startScreen{
-position:relative;
-width:100vw;
-height:100vh;
-background:url("start_bg.png") no-repeat center center;
-background-size:cover;
-overflow:hidden;
-}
-#titleImage{
-position:absolute;
-top:20%;
-left:50%;
-transform:translateX(-50%);
-width:700px;
-z-index:3;
-}
-.floatingJuni{
-position:absolute;
-width:120px;
-pointer-events:auto;
-z-index:2;
+    position:relative;
+    width:100vw;
+    height:100vh;
+    background:url("start_bg.png") no-repeat center center;
+    background-size:cover;
+    overflow:hidden;
 }
 
-/* 🔥 수정: 로그인 + 게임하기 가운데 아래 배치 */
-#startButtons{
-position:absolute;
-bottom:60px;
-left:50%;
-transform:translateX(-50%);
-display:flex;
-gap:20px;
-z-index:4;
+#titleImage{
+    position:absolute;
+    top:20%;
+    left:50%;
+    transform:translateX(-50%);
+    width:700px;
+    z-index:3;
+}
+
+.floatingJuni{
+    position:absolute;
+    width:120px;
+    pointer-events:auto;
+    z-index:2;
+}
+
+#startBtn{
+    position:absolute;
+    bottom:60px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:4;
+}
+
+#loginBtn{
+    position:absolute;
+    top:20px;
+    left:20px;
+    z-index:4;
 }
 
 /* ================= 로그인 화면 ================= */
+
 .screen{
-position:fixed;
-width:100%;
-height:100%;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
+    position:fixed;
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
 }
+
 #loginScreen{ display:none; background:#dfe9f3; }
 #userScreen{ display:none; background:#f6d365; }
 
-input{ padding:10px; font-size:18px; margin:5px; }
+input{
+    padding:10px;
+    font-size:18px;
+    margin:5px;
+}
 
 /* ================= 게임 선택 화면 ================= */
+
 #menuScreen{
-display:none;
-position:fixed;
-width:100%;
-height:100%;
-background:url("start_bg.png") no-repeat center center;
-background-size:cover;
+    display:none;
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:url("start_bg.png") no-repeat center center;
+    background-size:cover;
 }
+
 #menuButtons{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-display:flex;
-flex-direction:column;
-gap:25px;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    display:flex;
+    flex-direction:column;
+    gap:25px;
 }
+
 .topBack{
-position:absolute;
-top:20px;
-right:20px;
+    position:absolute;
+    top:20px;
+    right:20px;
 }
 
 /* ================= 게임 ================= */
+
 #gameWrapper{
-display:none;
-position:fixed;
-width:100%;
-height:100%;
+    display:none;
+    position:fixed;
+    width:100%;
+    height:100%;
 }
+
 #game{
-display:none;
-width:100vw;
-max-width:1200px;
-height:450px;
-background:url("background.png") no-repeat center center;
-background-size:cover;
-position:absolute;
-left:50%;
-top:50%;
-transform:translate(-50%,-50%);
-overflow:hidden;
-border-radius:20px;
+    display:none;
+    width:100vw;
+    max-width:1200px;
+    height:450px;
+    background:url("background.png") no-repeat center center;
+    background-size:cover;
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    overflow:hidden;
+    border-radius:20px;
 }
+
 #juni{
-width:80px;
-position:absolute;
-bottom:0;
-left:100px;
-transition:0.1s;
+    width:80px;
+    position:absolute;
+    bottom:0;
+    left:100px;
 }
+
 .obstacle{
-position:absolute;
-bottom:0;
+    position:absolute;
+    bottom:0;
 }
+
 #scoreBoard{
-position:absolute;
-top:15px;
-left:20px;
-font-size:24px;
-color:white;
-text-shadow:2px 2px 5px black;
+    position:absolute;
+    top:15px;
+    left:20px;
+    font-size:24px;
+    color:white;
+    text-shadow:2px 2px 5px black;
 }
 </style>
 </head>
@@ -141,289 +170,242 @@ text-shadow:2px 2px 5px black;
 
 <!-- 시작화면 -->
 <div id="startScreen">
-<img src="juni_text.png" id="titleImage">
-
-<div id="startButtons">
-<button onclick="showLogin()">Login</button>
-<button onclick="openMenu()">게임하기</button>
-</div>
+    <img src="juni_text.png" id="titleImage">
+    <button id="loginBtn" onclick="showLogin()">Login</button>
+    <button id="startBtn" onclick="openMenu()">게임하기</button>
 </div>
 
 <!-- 로그인 -->
 <div id="loginScreen" class="screen">
-<h2>회원가입 / 로그인</h2>
-<input id="loginName" placeholder="이름">
-<input id="loginPw" type="password" placeholder="비밀번호">
-<button onclick="loginUser()">확인</button>
-<button onclick="goHome()">Back</button>
+    <h2>회원가입 / 로그인</h2>
+    <input id="loginName" placeholder="이름">
+    <input id="loginPw" type="password" placeholder="비밀번호">
+    <button onclick="loginUser()">확인</button>
+    <button onclick="goHome()">Back</button>
 </div>
 
 <!-- 유저 화면 -->
 <div id="userScreen" class="screen">
-<h1 id="welcomeText"></h1>
-<h2 id="coinText"></h2>
-<button onclick="goHome()">홈으로</button>
+    <h1 id="welcomeText"></h1>
+    <button onclick="goHome()">홈으로</button>
 </div>
 
 <!-- 게임 선택 화면 -->
 <div id="menuScreen">
-<button class="topBack" onclick="goStart()">뒤로</button>
-<div id="menuButtons">
-<button onclick="openJuniRun()">준이런</button>
-<button>준이의 솔로탈출</button>
-<button>준이는 배고파</button>
-</div>
+    <button class="topBack" onclick="goStart()">뒤로</button>
+    <div id="menuButtons">
+        <button onclick="openJuniRun()">준이런</button>
+        <button>준이의 솔로탈출</button>
+        <button>준이는 배고파</button>
+    </div>
 </div>
 
 <!-- 게임 화면 -->
 <div id="gameWrapper">
-<button class="topBack" onclick="backToMenu()">뒤로</button>
-<div id="game">
-<div id="scoreBoard">Time: 0s | Coin: 0</div>
-<img id="juni" src="juni.png">
-</div>
+    <button class="topBack" onclick="backToMenu()">뒤로</button>
+    <div id="game">
+        <div id="scoreBoard">Time: 0s</div>
+        <img id="juni" src="juni.png">
+    </div>
 </div>
 
 <script>
 
-/* ================= 떠다니는 준이 (그대로 유지) ================= */
+/* ================= 떠다니는 준이 ================= */
+
 function createFloatingJunis(){
-for(let i=0;i<7;i++){
-let img=document.createElement("img");
-img.src="juni.png";
-img.className="floatingJuni";
-document.getElementById("startScreen").appendChild(img);
+    for(let i=0;i<7;i++){
+        let img=document.createElement("img");
+        img.src="juni.png";
+        img.className="floatingJuni";
+        document.getElementById("startScreen").appendChild(img);
 
-let x=Math.random()*window.innerWidth;
-let y=Math.random()*window.innerHeight;
-let speedX=(Math.random()-0.5)*3;
-let speedY=(Math.random()-0.5)*3;
+        let x=Math.random()*window.innerWidth;
+        let y=Math.random()*window.innerHeight;
+        let speedX=(Math.random()-0.5)*3;
+        let speedY=(Math.random()-0.5)*3;
+        let rotation=Math.random()*360;
+        let rotationSpeed=(Math.random()-0.5)*5;
 
-function animate(){
-x+=speedX; y+=speedY;
-if(x>window.innerWidth+150) x=-150;
-if(x<-150) x=window.innerWidth+150;
-if(y>window.innerHeight+150) y=-150;
-if(y<-150) y=window.innerHeight+150;
-img.style.transform=`translate(${x}px,${y}px)`;
-requestAnimationFrame(animate);
-}
-animate();
-}
+        let revertTimeout=null;
+
+        function changeToHeart(){
+            img.src="juni_heart.png";
+            clearTimeout(revertTimeout);
+            revertTimeout=setTimeout(()=>{
+                img.src="juni.png";
+            },3000);
+        }
+
+        img.addEventListener("click",changeToHeart);
+        img.addEventListener("touchstart",changeToHeart);
+
+        function animate(){
+            x+=speedX;
+            y+=speedY;
+            rotation+=rotationSpeed;
+
+            if(x>window.innerWidth+150) x=-150;
+            if(x<-150) x=window.innerWidth+150;
+            if(y>window.innerHeight+150) y=-150;
+            if(y<-150) y=window.innerHeight+150;
+
+            img.style.transform=`translate(${x}px,${y}px) rotate(${rotation}deg)`;
+            requestAnimationFrame(animate);
+        }
+        animate();
+    }
 }
 createFloatingJunis();
 
-/* ================= 로그인 시스템 (코인 누적 추가) ================= */
+/* ================= 로그인 시스템 ================= */
+
 let currentUser=null;
 
 function showLogin(){
-startScreen.style.display="none";
-loginScreen.style.display="flex";
+    startScreen.style.display="none";
+    loginScreen.style.display="flex";
 }
 
 function loginUser(){
-let name=loginName.value.trim();
-let pw=loginPw.value.trim();
-if(!name||!pw){ alert("입력"); return;}
+    let name=loginName.value.trim();
+    let pw=loginPw.value.trim();
+    if(!name||!pw){ alert("이름과 비밀번호 입력"); return; }
 
-let users=JSON.parse(localStorage.getItem("users")||"{}");
-if(!users[name]){
-users[name]={pw:pw, coin:0};
-}
-currentUser=name;
-localStorage.setItem("users",JSON.stringify(users));
-goHome();
+    let users=JSON.parse(localStorage.getItem("users")||"{}");
+
+    if(users[name]&&users[name]!==pw){
+        alert("이미 존재하는 이름");
+        return;
+    }
+
+    if(!users[name]){
+        users[name]=pw;
+        localStorage.setItem("users",JSON.stringify(users));
+    }
+
+    currentUser=name;
+    loginBtn.innerText="🏠";
+    loginBtn.onclick=openUserScreen;
+    goHome();
 }
 
 function openUserScreen(){
-startScreen.style.display="none";
-userScreen.style.display="flex";
-let users=JSON.parse(localStorage.getItem("users"));
-welcomeText.innerText=currentUser+"님 환영합니다!";
-coinText.innerText="총 코인: "+users[currentUser].coin;
+    startScreen.style.display="none";
+    userScreen.style.display="flex";
+    welcomeText.innerText=currentUser+"님 환영합니다!";
 }
 
 function goHome(){
-loginScreen.style.display="none";
-userScreen.style.display="none";
-startScreen.style.display="block";
+    loginScreen.style.display="none";
+    userScreen.style.display="none";
+    startScreen.style.display="block";
 }
 
-/* ================= 게임 ================= */
-let time=0;
-let speed=6;
-let gameOver=false;
-let obstacleTimeout;
-let timerInterval;
-let jumpCount=0;
-let coin=0;
+/* ================= 화면 전환 ================= */
 
-/* 🔥 랜덤 장애물 생성 */
-function createObstacle(){
-
-let obstacle=document.createElement("img");
-let type=Math.random();
-
-if(type<0.4){
-obstacle.src="obstacle1.png";
-obstacle.style.width="50px";
-obstacle.dataset.type="jump1";
-}
-else if(type<0.7){
-obstacle.src="obstacle1.png";
-obstacle.style.width="90px";
-obstacle.dataset.type="jump2";
-}
-else{
-obstacle.src="obstacle_slice.png";
-obstacle.style.width="70px";
-obstacle.dataset.type="slice";
+function openMenu(){
+    startScreen.style.display="none";
+    menuScreen.style.display="block";
 }
 
-obstacle.className="obstacle";
-obstacle.style.left=game.offsetWidth+"px";
-game.appendChild(obstacle);
-
-let passed=false;
-
-let move=setInterval(()=>{
-
-if(gameOver){ clearInterval(move); return;}
-
-let jr=juni.getBoundingClientRect();
-let or=obstacle.getBoundingClientRect();
-
-if(jr.right-20>or.left+15 && jr.left+20<or.right-15){
-
-if(obstacle.dataset.type==="slice"){
-if(!isSliding){ gameOver=true; }
-}
-else if(obstacle.dataset.type==="jump1"){
-if(jumpCount<1){ gameOver=true; }
-}
-else if(obstacle.dataset.type==="jump2"){
-if(jumpCount<2){ gameOver=true; }
-}
-}
-
-if(!passed && obstacle.offsetLeft<juni.offsetLeft){
-coin++;
-scoreBoard.innerHTML="Time: "+time+"s | Coin: "+coin;
-passed=true;
-}
-
-obstacle.style.left=obstacle.offsetLeft-speed+"px";
-
-if(obstacle.offsetLeft<-120){
-obstacle.remove();
-clearInterval(move);
-}
-
-},20);
-
-/* 🔥 랜덤 간격 */
-let delay=1000+Math.random()*1500;
-obstacleTimeout=setTimeout(createObstacle,delay);
-}
-
-let isSliding=false;
-
-document.addEventListener("keydown",e=>{
-if(gameOver)return;
-
-if(e.key==="ArrowUp"){
-jump();
-}
-if(e.key==="ArrowDown"){
-slide();
-}
-});
-
-let touchStartY=0;
-document.addEventListener("touchstart",e=>{
-touchStartY=e.touches[0].clientY;
-});
-document.addEventListener("touchend",e=>{
-let diff=e.changedTouches[0].clientY-touchStartY;
-if(diff<-30) jump();
-if(diff>30) slide();
-});
-
-function jump(){
-if(jumpCount>=2)return;
-jumpCount++;
-
-let height=0;
-let target=jumpCount==1?120:220;
-
-let up=setInterval(()=>{
-if(height>=target){
-clearInterval(up);
-let down=setInterval(()=>{
-height-=8;
-if(height<=0){
-height=0;
-jumpCount=0;
-clearInterval(down);
-}
-juni.style.bottom=height+"px";
-},20);
-}
-height+=8;
-juni.style.bottom=height+"px";
-},20);
-}
-
-function slide(){
-if(isSliding)return;
-isSliding=true;
-juni.src="juni_slide.png";
-setTimeout(()=>{
-juni.src="juni.png";
-isSliding=false;
-},500);
-}
-
-function resetGame(){
-document.querySelectorAll(".obstacle").forEach(o=>o.remove());
-gameOver=false;
-time=0;
-speed=6;
-coin=0;
-scoreBoard.innerHTML="Time: 0s | Coin: 0";
-
-clearTimeout(obstacleTimeout);
-
-obstacleTimeout=setTimeout(createObstacle,1000);
-
-timerInterval=setInterval(()=>{
-time++;
-speed+=0.3;
-scoreBoard.innerHTML="Time: "+time+"s | Coin: "+coin;
-},1000);
+function goStart(){
+    menuScreen.style.display="none";
+    startScreen.style.display="block";
 }
 
 function openJuniRun(){
-menuScreen.style.display="none";
-gameWrapper.style.display="block";
-game.style.display="block";
-resetGame();
+    menuScreen.style.display="none";
+    gameWrapper.style.display="block";
+    game.style.display="block";
+    resetGame();
 }
 
 function backToMenu(){
-clearInterval(timerInterval);
-clearTimeout(obstacleTimeout);
-
-if(currentUser){
-let users=JSON.parse(localStorage.getItem("users"));
-users[currentUser].coin+=coin;
-localStorage.setItem("users",JSON.stringify(users));
+    gameWrapper.style.display="none";
+    menuScreen.style.display="block";
 }
 
-gameWrapper.style.display="none";
-menuScreen.style.display="block";
+/* ================= 게임 로직 (원본 유지) ================= */
+
+let time=0;
+let speed=6;
+let gameOver=false;
+let obstacleInterval,timerInterval;
+
+function resetGame(){
+    document.querySelectorAll(".obstacle").forEach(o=>o.remove());
+    gameOver=false;
+    time=0;
+    speed=6;
+    scoreBoard.innerHTML="Time: 0s";
+
+    obstacleInterval=setInterval(createObstacle,2000);
+    timerInterval=setInterval(()=>{
+        time++;
+        speed+=0.2;
+        scoreBoard.innerHTML="Time: "+time+"s";
+    },1000);
 }
 
+document.addEventListener("keydown",e=>{
+    if(e.code==="Space"){
+        if(gameOver){ resetGame(); }
+        else{ jump(); }
+    }
+});
+
+function jump(){
+    if(gameOver)return;
+
+    let height=0;
+    let up=setInterval(()=>{
+        if(height>=130){
+            clearInterval(up);
+            let down=setInterval(()=>{
+                if(height<=0) clearInterval(down);
+                height-=6;
+                juni.style.bottom=height+"px";
+            },20);
+        }
+        height+=6;
+        juni.style.bottom=height+"px";
+    },20);
+}
+
+function createObstacle(){
+    let obstacle=document.createElement("img");
+    obstacle.src="obstacle1.png";
+    obstacle.style.width="60px";
+    obstacle.className="obstacle";
+    obstacle.style.left=game.offsetWidth+"px";
+    game.appendChild(obstacle);
+
+    let move=setInterval(()=>{
+        if(gameOver){clearInterval(move);return;}
+
+        let jr=juni.getBoundingClientRect();
+        let or=obstacle.getBoundingClientRect();
+
+        if(jr.right-20>or.left+15 &&
+           jr.left+20<or.right-15 &&
+           jr.bottom-10>or.top+10){
+
+            gameOver=true;
+            clearInterval(obstacleInterval);
+            clearInterval(timerInterval);
+            alert("게임오버! 스페이스로 재시작");
+        }
+
+        obstacle.style.left=obstacle.offsetLeft-speed+"px";
+
+        if(obstacle.offsetLeft<-120){
+            obstacle.remove();
+            clearInterval(move);
+        }
+    },20);
+}
 </script>
+
 </body>
 </html>
