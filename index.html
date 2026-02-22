@@ -198,6 +198,7 @@ input{
 <!-- 유저 화면 -->
 <div id="userScreen" class="screen">
     <h1 id="welcomeText"></h1>
+    <h2 id="coinText"></h2>
     <button onclick="goHome()">홈으로</button>
 </div>
 
@@ -307,7 +308,6 @@ function openUserScreen(){
     welcomeText.innerText=currentUser+"님 환영합니다!";
 }
     let users = JSON.parse(localStorage.getItem("users"));
-welcomeText.innerText = currentUser+"님 환영합니다!";
 coinText.innerText = "총 코인: " + (users[currentUser].coin || 0);
 
 function goHome(){
@@ -352,19 +352,21 @@ let time=0;
 let speed=6;
 let gameOver=false;
 let obstacleInterval,timerInterval;
+let coin = 0;
 
 function resetGame(){
     document.querySelectorAll(".obstacle").forEach(o=>o.remove());
     gameOver=false;
     time=0;
     speed=6;
+    coin = 0;
     scoreBoard.innerHTML="Time: 0s";
-
+    
     obstacleInterval=setInterval(createObstacle,2000);
     timerInterval=setInterval(()=>{
         time++;
         speed+=0.2;
-        scoreBoard.innerHTML="Time: "+time+"s";
+        scoreBoard.innerHTML="Time: "+time+"s | Coin: "+coin;
     },1000);
 }
 
