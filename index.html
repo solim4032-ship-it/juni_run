@@ -7,12 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 
 <style>
-body{
-    margin:0;
-    overflow:hidden;
-}
-
-/* ================= 공통 버튼 ================= */
+body{ margin:0; overflow:hidden; }
 
 button{
     font-family:'Jua', sans-serif;
@@ -24,13 +19,9 @@ button{
     background:white;
     transition:0.2s;
 }
+button:hover{ transform:scale(1.1); }
 
-button:hover{
-    transform:scale(1.1);
-}
-
-/* ================= 시작화면 ================= */
-
+/* 시작화면 */
 #startScreen{
     position:relative;
     width:100vw;
@@ -49,29 +40,22 @@ button:hover{
     z-index:3;
 }
 
+.startButtons{
+    position:absolute;
+    bottom:60px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:20px;
+    z-index:4;
+}
+
 .floatingJuni{
     position:absolute;
     width:120px;
     pointer-events:auto;
     z-index:2;
 }
-
-#startBtn{
-    position:absolute;
-    bottom:60px;
-    left:50%;
-    transform:translateX(-50%);
-    z-index:4;
-}
-
-#loginBtn{
-    position:absolute;
-    top:20px;
-    left:20px;
-    z-index:4;
-}
-
-/* ================= 로그인 화면 ================= */
 
 .screen{
     position:fixed;
@@ -86,14 +70,9 @@ button:hover{
 #loginScreen{ display:none; background:#dfe9f3; }
 #userScreen{ display:none; background:#f6d365; }
 
-input{
-    padding:10px;
-    font-size:18px;
-    margin:5px;
-}
+input{ padding:10px; font-size:18px; margin:5px; }
 
-/* ================= 게임 선택 화면 ================= */
-
+/* 메뉴 */
 #menuScreen{
     display:none;
     position:fixed;
@@ -119,8 +98,7 @@ input{
     right:20px;
 }
 
-/* ================= 게임 ================= */
-
+/* 게임 */
 #gameWrapper{
     display:none;
     position:fixed;
@@ -171,8 +149,10 @@ input{
 <!-- 시작화면 -->
 <div id="startScreen">
     <img src="juni_text.png" id="titleImage">
-    <button id="loginBtn" onclick="showLogin()">Login</button>
-    <button id="startBtn" onclick="openMenu()">게임하기</button>
+    <div class="startButtons">
+        <button onclick="openMenu()">게임하기</button>
+        <button onclick="showLogin()">Login</button>
+    </div>
 </div>
 
 <!-- 로그인 -->
@@ -187,10 +167,11 @@ input{
 <!-- 유저 화면 -->
 <div id="userScreen" class="screen">
     <h1 id="welcomeText"></h1>
+    <p id="coinInfo"></p>
     <button onclick="goHome()">홈으로</button>
 </div>
 
-<!-- 게임 선택 화면 -->
+<!-- 메뉴 -->
 <div id="menuScreen">
     <button class="topBack" onclick="goStart()">뒤로</button>
     <div id="menuButtons">
@@ -200,66 +181,18 @@ input{
     </div>
 </div>
 
-<!-- 게임 화면 -->
+<!-- 게임 -->
 <div id="gameWrapper">
     <button class="topBack" onclick="backToMenu()">뒤로</button>
     <div id="game">
-        <div id="scoreBoard">Time: 0s</div>
+        <div id="scoreBoard">Time: 0s | Coin: 0</div>
         <img id="juni" src="juni.png">
     </div>
 </div>
 
 <script>
 
-/* ================= 떠다니는 준이 ================= */
-
-function createFloatingJunis(){
-    for(let i=0;i<7;i++){
-        let img=document.createElement("img");
-        img.src="juni.png";
-        img.className="floatingJuni";
-        document.getElementById("startScreen").appendChild(img);
-
-        let x=Math.random()*window.innerWidth;
-        let y=Math.random()*window.innerHeight;
-        let speedX=(Math.random()-0.5)*3;
-        let speedY=(Math.random()-0.5)*3;
-        let rotation=Math.random()*360;
-        let rotationSpeed=(Math.random()-0.5)*5;
-
-        let revertTimeout=null;
-
-        function changeToHeart(){
-            img.src="juni_heart.png";
-            clearTimeout(revertTimeout);
-            revertTimeout=setTimeout(()=>{
-                img.src="juni.png";
-            },3000);
-        }
-
-        img.addEventListener("click",changeToHeart);
-        img.addEventListener("touchstart",changeToHeart);
-
-        function animate(){
-            x+=speedX;
-            y+=speedY;
-            rotation+=rotationSpeed;
-
-            if(x>window.innerWidth+150) x=-150;
-            if(x<-150) x=window.innerWidth+150;
-            if(y>window.innerHeight+150) y=-150;
-            if(y<-150) y=window.innerHeight+150;
-
-            img.style.transform=`translate(${x}px,${y}px) rotate(${rotation}deg)`;
-            requestAnimationFrame(animate);
-        }
-        animate();
-    }
-}
-createFloatingJunis();
-
-/* ================= 로그인 시스템 ================= */
-
+/* 로그인 */
 let currentUser=null;
 
 function showLogin(){
@@ -270,14 +203,10 @@ function showLogin(){
 function loginUser(){
     let name=loginName.value.trim();
     let pw=loginPw.value.trim();
-    if(!name||!pw){ alert("이름과 비밀번호 입력"); return; }
+    if(!name||!pw){ alert("입력"); return; }
 
     let users=JSON.parse(localStorage.getItem("users")||"{}");
-
-    if(users[name]&&users[name]!==pw){
-        alert("이미 존재하는 이름");
-        return;
-    }
+    if(users[name]&&users[name]!==pw){ alert("이미 존재"); return; }
 
     if(!users[name]){
         users[name]=pw;
@@ -285,15 +214,7 @@ function loginUser(){
     }
 
     currentUser=name;
-    loginBtn.innerText="🏠";
-    loginBtn.onclick=openUserScreen;
     goHome();
-}
-
-function openUserScreen(){
-    startScreen.style.display="none";
-    userScreen.style.display="flex";
-    welcomeText.innerText=currentUser+"님 환영합니다!";
 }
 
 function goHome(){
@@ -301,8 +222,6 @@ function goHome(){
     userScreen.style.display="none";
     startScreen.style.display="block";
 }
-
-/* ================= 화면 전환 ================= */
 
 function openMenu(){
     startScreen.style.display="none";
@@ -326,63 +245,114 @@ function backToMenu(){
     menuScreen.style.display="block";
 }
 
-/* ================= 게임 로직 (원본 유지) ================= */
+/* ===== 업그레이드 게임 ===== */
 
 let time=0;
 let speed=6;
 let gameOver=false;
-let obstacleInterval,timerInterval;
+let obstacleTimeout,timerInterval;
+let jumpLevel=0;
+let isSliding=false;
+let coins=0;
 
 function resetGame(){
     document.querySelectorAll(".obstacle").forEach(o=>o.remove());
     gameOver=false;
     time=0;
     speed=6;
-    scoreBoard.innerHTML="Time: 0s";
+    jumpLevel=0;
+    coins=0;
+    scoreBoard.innerHTML="Time: 0s | Coin: 0";
 
-    obstacleInterval=setInterval(createObstacle,2000);
+    spawnObstacle();
+
     timerInterval=setInterval(()=>{
         time++;
-        speed+=0.2;
-        scoreBoard.innerHTML="Time: "+time+"s";
+        speed+=0.3;
+        scoreBoard.innerHTML="Time: "+time+"s | Coin: "+coins;
     },1000);
 }
 
-document.addEventListener("keydown",e=>{
-    if(e.code==="Space"){
-        if(gameOver){ resetGame(); }
-        else{ jump(); }
-    }
-});
-
 function jump(){
-    if(gameOver)return;
+    if(gameOver || jumpLevel>=2) return;
+    jumpLevel++;
 
-    let height=0;
+    let height=parseInt(juni.style.bottom)||0;
+    let maxHeight = jumpLevel===1 ? 120 : 200;
+
     let up=setInterval(()=>{
-        if(height>=130){
+        if(height>=maxHeight){
             clearInterval(up);
             let down=setInterval(()=>{
-                if(height<=0) clearInterval(down);
-                height-=6;
+                if(height<=0){
+                    height=0;
+                    jumpLevel=0;
+                    clearInterval(down);
+                }
+                height-=8;
                 juni.style.bottom=height+"px";
             },20);
         }
-        height+=6;
+        height+=8;
         juni.style.bottom=height+"px";
     },20);
 }
 
-function createObstacle(){
+function slide(){
+    if(gameOver || isSliding) return;
+    isSliding=true;
+    juni.src="juni_slide.png";
+    setTimeout(()=>{
+        juni.src="juni.png";
+        isSliding=false;
+    },600);
+}
+
+document.addEventListener("keydown",e=>{
+    if(e.code==="ArrowUp") jump();
+    if(e.code==="ArrowDown") slide();
+});
+
+/* 장애물 */
+
+function spawnObstacle(){
+    if(gameOver) return;
+
     let obstacle=document.createElement("img");
-    obstacle.src="obstacle1.png";
-    obstacle.style.width="60px";
     obstacle.className="obstacle";
+
+    let type=Math.random();
+
+    if(type<0.33){
+        obstacle.src="obstacle1.png";
+        obstacle.style.width="60px";
+        obstacle.dataset.type="jump1";
+    }
+    else if(type<0.66){
+        obstacle.src="obstacle1.png";
+        obstacle.style.width="90px";
+        obstacle.dataset.type="jump2";
+    }
+    else{
+        obstacle.src="obstacle_slice.png";
+        obstacle.style.width="70px";
+        obstacle.style.bottom="60px";
+        obstacle.dataset.type="slice";
+    }
+
     obstacle.style.left=game.offsetWidth+"px";
     game.appendChild(obstacle);
 
+    moveObstacle(obstacle);
+
+    let nextDelay=800+Math.random()*1500;
+    obstacleTimeout=setTimeout(spawnObstacle,nextDelay);
+}
+
+function moveObstacle(obstacle){
     let move=setInterval(()=>{
-        if(gameOver){clearInterval(move);return;}
+
+        if(gameOver){ clearInterval(move); return; }
 
         let jr=juni.getBoundingClientRect();
         let or=obstacle.getBoundingClientRect();
@@ -391,21 +361,36 @@ function createObstacle(){
            jr.left+20<or.right-15 &&
            jr.bottom-10>or.top+10){
 
-            gameOver=true;
-            clearInterval(obstacleInterval);
-            clearInterval(timerInterval);
-            alert("게임오버! 스페이스로 재시작");
+            if(obstacle.dataset.type==="slice" && isSliding){}
+            else if(obstacle.dataset.type==="jump1" && jumpLevel>=1){}
+            else if(obstacle.dataset.type==="jump2" && jumpLevel>=2){}
+            else{
+                gameOver=true;
+                juni.src="juni_angry.png";
+                clearInterval(timerInterval);
+                clearTimeout(obstacleTimeout);
+                alert("게임오버!");
+            }
         }
 
         obstacle.style.left=obstacle.offsetLeft-speed+"px";
 
         if(obstacle.offsetLeft<-120){
             obstacle.remove();
+            coins++;
+            scoreBoard.innerHTML="Time: "+time+"s | Coin: "+coins;
+
+            if(currentUser){
+                let saved=localStorage.getItem(currentUser+"_coin")||0;
+                localStorage.setItem(currentUser+"_coin",parseInt(saved)+1);
+            }
+
             clearInterval(move);
         }
+
     },20);
 }
-</script>
 
+</script>
 </body>
 </html>
