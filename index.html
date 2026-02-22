@@ -306,6 +306,9 @@ function openUserScreen(){
     userScreen.style.display="flex";
     welcomeText.innerText=currentUser+"님 환영합니다!";
 }
+    let users = JSON.parse(localStorage.getItem("users"));
+welcomeText.innerText = currentUser+"님 환영합니다!";
+coinText.innerText = "총 코인: " + (users[currentUser].coin || 0);
 
 function goHome(){
     loginScreen.style.display="none";
@@ -335,6 +338,12 @@ function openJuniRun(){
 function backToMenu(){
     gameWrapper.style.display="none";
     menuScreen.style.display="block";
+}
+    if(currentUser){
+  let users = JSON.parse(localStorage.getItem("users"));
+  if(!users[currentUser].coin) users[currentUser].coin = 0;
+  users[currentUser].coin += coin;
+  localStorage.setItem("users", JSON.stringify(users));
 }
 
 /* ================= 게임 로직 (원본 유지) ================= */
