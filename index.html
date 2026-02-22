@@ -2,59 +2,18 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Juni Run</title>
+<title>Juni World</title>
 
-<!-- 귀엽고 두꺼운 폰트 -->
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 
 <style>
 body{
     margin:0;
     overflow:hidden;
-    font-family: Arial Black, sans-serif;
 }
 
-/* ================= 시작화면 ================= */
+/* ================= 공통 버튼 ================= */
 
-#startScreen{
-    position:relative;
-    width:100vw;
-    height:100vh;
-    background:url("start_bg.png") no-repeat center center;
-    background-size:cover;
-    overflow:hidden;
-}
-
-/* JUNI 문구 */
-#titleImage{
-    position:absolute;
-    top:20%;
-    left:50%;
-    transform:translateX(-50%);
-    width:700px;
-    z-index:3;
-}
-
-/* 움직이는 준이 */
-.floatingJuni{
-    position:absolute;
-    width:120px;
-    pointer-events:none;
-    z-index:2; /* titleImage보다 뒤 */
-}
-
-/* 하단 버튼 */
-#bottomUI{
-    position:absolute;
-    bottom:40px;
-    left:50%;
-    transform:translateX(-50%);
-    display:flex;
-    gap:20px;
-    z-index:4;
-}
-
-/* 모든 버튼 공통 */
 button{
     font-family:'Jua', sans-serif;
     padding:15px 40px;
@@ -70,25 +29,66 @@ button:hover{
     transform:scale(1.1);
 }
 
-/* ================= 로그인 ================= */
+/* ================= 시작화면 ================= */
 
-.screen{
+#startScreen{
+    position:relative;
+    width:100vw;
+    height:100vh;
+    background:url("start_bg.png") no-repeat center center;
+    background-size:cover;
+    overflow:hidden;
+}
+
+#titleImage{
+    position:absolute;
+    top:20%;
+    left:50%;
+    transform:translateX(-50%);
+    width:700px;
+    z-index:3;
+}
+
+.floatingJuni{
+    position:absolute;
+    width:120px;
+    pointer-events:auto;
+    z-index:2;
+}
+
+#startBtn{
+    position:absolute;
+    bottom:60px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:4;
+}
+
+/* ================= 게임 선택 화면 ================= */
+
+#menuScreen{
+    display:none;
     position:fixed;
     width:100%;
     height:100%;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
+    background:url("start_bg.png") no-repeat center center;
+    background-size:cover;
 }
 
-#loginScreen{ display:none; background:#dfe9f3; }
-#userScreen{ display:none; background:#f6d365; }
+#menuButtons{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    display:flex;
+    flex-direction:column;
+    gap:25px;
+}
 
-input{
-    padding:10px;
-    font-size:18px;
-    margin:5px;
+.topBack{
+    position:absolute;
+    top:20px;
+    right:20px;
 }
 
 /* ================= 게임 ================= */
@@ -98,14 +98,6 @@ input{
     position:fixed;
     width:100%;
     height:100%;
-}
-
-#readyBtn{
-    position:absolute;
-    top:20%;
-    left:50%;
-    transform:translateX(-50%);
-    z-index:5;
 }
 
 #game{
@@ -148,33 +140,25 @@ input{
 
 <body>
 
-<!-- 시작 화면 -->
+<!-- 시작화면 -->
 <div id="startScreen">
     <img src="juni_text.png" id="titleImage">
-    <div id="bottomUI">
-        <button onclick="openReady()">게임하기</button>
-        <button id="loginBtn" onclick="showLogin()">Login</button>
+    <button id="startBtn" onclick="openMenu()">게임하기</button>
+</div>
+
+<!-- 게임 선택 화면 -->
+<div id="menuScreen">
+    <button class="topBack" onclick="goStart()">뒤로</button>
+    <div id="menuButtons">
+        <button onclick="openJuniRun()">준이런</button>
+        <button>준이의 솔로탈출</button>
+        <button>준이는 배고파</button>
     </div>
 </div>
 
-<!-- 로그인 -->
-<div id="loginScreen" class="screen">
-    <h2>회원가입 / 로그인</h2>
-    <input id="loginName" placeholder="이름">
-    <input id="loginPw" type="password" placeholder="비밀번호">
-    <button onclick="loginUser()">확인</button>
-    <button onclick="goHome()">Back</button>
-</div>
-
-<!-- 유저 화면 -->
-<div id="userScreen" class="screen">
-    <h1 id="welcomeText"></h1>
-    <button onclick="goHome()">홈으로</button>
-</div>
-
-<!-- 게임 준비 화면 -->
+<!-- 게임 화면 -->
 <div id="gameWrapper">
-    <button id="readyBtn" onclick="startGame()">준이런</button>
+    <button class="topBack" onclick="backToMenu()">뒤로</button>
     <div id="game">
         <div id="scoreBoard">Time: 0s</div>
         <img id="juni" src="juni.png">
@@ -183,7 +167,7 @@ input{
 
 <script>
 
-/* ================= 시작화면 준이 ================= */
+/* ================= 떠다니는 준이 ================= */
 
 function createFloatingJunis(){
     for(let i=0;i<7;i++){
@@ -198,6 +182,14 @@ function createFloatingJunis(){
         let speedY=(Math.random()-0.5)*3;
         let rotation=Math.random()*360;
         let rotationSpeed=(Math.random()-0.5)*5;
+
+        img.addEventListener("click",()=>{
+            img.src = img.src.includes("juni_heart.png") ? "juni.png" : "juni_heart.png";
+        });
+
+        img.addEventListener("touchstart",()=>{
+            img.src = img.src.includes("juni_heart.png") ? "juni.png" : "juni_heart.png";
+        });
 
         function animate(){
             x+=speedX;
@@ -217,48 +209,28 @@ function createFloatingJunis(){
 }
 createFloatingJunis();
 
-/* ================= 로그인 ================= */
+/* ================= 화면 전환 ================= */
 
-let currentUser=null;
-
-function showLogin(){
+function openMenu(){
     startScreen.style.display="none";
-    loginScreen.style.display="flex";
+    menuScreen.style.display="block";
 }
 
-function loginUser(){
-    let name=loginName.value.trim();
-    let pw=loginPw.value.trim();
-    if(!name||!pw){ alert("이름과 비밀번호 입력"); return; }
-
-    let users=JSON.parse(localStorage.getItem("users")||"{}");
-
-    if(users[name]&&users[name]!==pw){
-        alert("이미 존재하는 이름");
-        return;
-    }
-
-    if(!users[name]){
-        users[name]=pw;
-        localStorage.setItem("users",JSON.stringify(users));
-    }
-
-    currentUser=name;
-    loginBtn.innerText="🏠";
-    loginBtn.onclick=openUserScreen;
-    goHome();
-}
-
-function openUserScreen(){
-    startScreen.style.display="none";
-    userScreen.style.display="flex";
-    welcomeText.innerText=currentUser+"님 환영합니다!";
-}
-
-function goHome(){
-    loginScreen.style.display="none";
-    userScreen.style.display="none";
+function goStart(){
+    menuScreen.style.display="none";
     startScreen.style.display="block";
+}
+
+function openJuniRun(){
+    menuScreen.style.display="none";
+    gameWrapper.style.display="block";
+    game.style.display="block";
+    resetGame();
+}
+
+function backToMenu(){
+    gameWrapper.style.display="none";
+    menuScreen.style.display="block";
 }
 
 /* ================= 게임 ================= */
@@ -268,15 +240,19 @@ let speed=6;
 let gameOver=false;
 let obstacleInterval,timerInterval;
 
-function openReady(){
-    startScreen.style.display="none";
-    gameWrapper.style.display="block";
-}
+function resetGame(){
+    document.querySelectorAll(".obstacle").forEach(o=>o.remove());
+    gameOver=false;
+    time=0;
+    speed=6;
+    scoreBoard.innerHTML="Time: 0s";
 
-function startGame(){
-    document.getElementById("readyBtn").style.display="none";
-    document.getElementById("game").style.display="block";
-    resetGame();
+    obstacleInterval=setInterval(createObstacle,2000);
+    timerInterval=setInterval(()=>{
+        time++;
+        speed+=0.2;
+        scoreBoard.innerHTML="Time: "+time+"s";
+    },1000);
 }
 
 document.addEventListener("keydown",e=>{
@@ -335,21 +311,6 @@ function createObstacle(){
             clearInterval(move);
         }
     },20);
-}
-
-function resetGame(){
-    document.querySelectorAll(".obstacle").forEach(o=>o.remove());
-    gameOver=false;
-    time=0;
-    speed=6;
-    scoreBoard.innerHTML="Time: 0s";
-
-    obstacleInterval=setInterval(createObstacle,2000);
-    timerInterval=setInterval(()=>{
-        time++;
-        speed+=0.2;
-        scoreBoard.innerHTML="Time: "+time+"s";
-    },1000);
 }
 </script>
 
