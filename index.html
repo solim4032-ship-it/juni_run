@@ -306,10 +306,11 @@ function openUserScreen(){
     startScreen.style.display="none";
     userScreen.style.display="flex";
     welcomeText.innerText=currentUser+"님 환영합니다!";
-}
-    let users = JSON.parse(localStorage.getItem("users"));
-coinText.innerText = "총 코인: " + (users[currentUser].coin || 0);
 
+    let users = JSON.parse(localStorage.getItem("users"));
+    coinText.innerText = "총 코인: " + (users[currentUser].coin || 0);
+}
+    
 function goHome(){
     loginScreen.style.display="none";
     userScreen.style.display="none";
@@ -336,14 +337,16 @@ function openJuniRun(){
 }
 
 function backToMenu(){
+
+    if(currentUser){
+        let users = JSON.parse(localStorage.getItem("users") || "{}");
+        if(!users[currentUser].coin) users[currentUser].coin = 0;
+        users[currentUser].coin += coin;
+        localStorage.setItem("users", JSON.stringify(users));
+    }
+
     gameWrapper.style.display="none";
     menuScreen.style.display="block";
-}
-    if(currentUser){
-  let users = JSON.parse(localStorage.getItem("users"));
-  if(!users[currentUser].coin) users[currentUser].coin = 0;
-  users[currentUser].coin += coin;
-  localStorage.setItem("users", JSON.stringify(users));
 }
 
 /* ================= 게임 로직 (원본 유지) ================= */
@@ -447,86 +450,17 @@ function slide(){
   },500);
 }
     
-function createObstacle(){
+function backToMenu(){
 
-  let obstacle = document.createElement("img");
-  let rand = Math.random();
-
-  if(rand < 0.4){
-    obstacle.src = "obstacle1.png";
-    obstacle.style.width = "50px";
-    obstacle.dataset.type = "jump1";
-  }
-  else if(rand < 0.7){
-    obstacle.src = "obstacle1.png";
-    obstacle.style.width = "90px";
-    obstacle.dataset.type = "jump2";
-  }
-  else{
-    obstacle.src = "obstacle_slice.png";
-    obstacle.style.width = "70px";
-    obstacle.dataset.type = "slice";
-  }
-
-  obstacle.className="obstacle";
-  obstacle.style.left = game.offsetWidth + "px";
-  game.appendChild(obstacle);
-
-  let passed = false;
-
-  let move = setInterval(()=>{
-
-    if(gameOver){ clearInterval(move); return; }
-
-    let jr = juni.getBoundingClientRect();
-    let or = obstacle.getBoundingClientRect();
-
-    if(jr.right-20 > or.left+15 && jr.left+20 < or.right-15){
-
-      if(obstacle.dataset.type === "slice"){
-        if(!isSliding) gameOver = true;
-      }
-
-      if(obstacle.dataset.type === "jump1"){
-        if(jumpLevel < 1) gameOver = true;
-      }
-
-      if(obstacle.dataset.type === "jump2"){
-        if(jumpLevel < 2) gameOver = true;
-      }{ 
-        gameOver=true;
-            clearInterval(obstacleInterval);
-            clearInterval(timerInterval);
-            alert("게임오버! 스페이스로 재시작");
-        }
-
-        obstacle.style.left=obstacle.offsetLeft-speed+"px";
-
-        if(obstacle.offsetLeft<-120){
-            obstacle.remove();
-            clearInterval(move);
-        }
-    },20);
-}
-
-    if(!passed && obstacle.offsetLeft < juni.offsetLeft){
-      coin++;
-      scoreBoard.innerHTML = "Time: "+time+"s | Coin: "+coin;
-      passed = true;
+    if(currentUser){
+        let users = JSON.parse(localStorage.getItem("users") || "{}");
+        if(!users[currentUser].coin) users[currentUser].coin = 0;
+        users[currentUser].coin += coin;
+        localStorage.setItem("users", JSON.stringify(users));
     }
 
-    obstacle.style.left = obstacle.offsetLeft - speed + "px";
-
-    if(obstacle.offsetLeft < -120){
-      obstacle.remove();
-      clearInterval(move);
-    }
-
-  },20);
-
-  /* 🔥 랜덤 간격 */
-  let delay = 1000 + Math.random()*1500;
-  setTimeout(createObstacle, delay);
+    gameWrapper.style.display="none";
+    menuScreen.style.display="block";
 }
 
            
