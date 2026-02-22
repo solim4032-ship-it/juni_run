@@ -374,13 +374,99 @@ function resetGame(){
     coin=0;
     scoreBoard.innerHTML="Time: 0s | Coin: 0";
     gameOverText.style.display = "none";
+    speed = 6;
+clearInterval(obstacleInterval);
+obstacleInterval = setInterval(createObstacle, 1500);
 
     clearInterval(timerInterval);
     timerInterval=setInterval(()=>{
-        time++;
-        coin++;
-        scoreBoard.innerHTML="Time: "+time+"s | Coin: "+coin;
-    },1000);
+    time++;
+    coin++;
+    speed += 0.3;   
+    scoreBoard.innerHTML=
+    "Time: "+time+"s | Coin: "+coin;
+
+},1000);
+
+}
+function createObstacle(){
+
+    if(gameOver) return;
+
+    const obstacle = document.createElement("img");
+    obstacle.classList.add("obstacle");
+
+    let type = Math.floor(Math.random()*3);
+
+    if(type === 0){
+        obstacle.src = "obstacle_jump.png"; // 1단 점프
+        obstacle.style.height = "60px";
+        obstacle.dataset.type = "jump1";
+    }
+    else if(type === 1){
+        obstacle.src = "obstacle_high.png"; // 2단 점프
+        obstacle.style.height = "120px";
+        obstacle.dataset.type = "jump2";
+    }
+    else{
+        obstacle.src = "obstacle_slide.png"; // 슬라이딩
+        obstacle.style.height = "80px";
+        obstacle.style.bottom = "80px";
+        obstacle.dataset.type = "slide";
+    }
+
+    obstacle.style.position = "absolute";
+    obstacle.style.right = "-60px";
+    obstacle.style.bottom = obstacle.style.bottom || "0px";
+
+    game.appendChild(obstacle);
+
+    moveObstacle(obstacle);
+
+    // 다음 장애물 간격 랜덤
+    clearInterval(obstacleInterval);
+    let randomGap = 1000 + Math.random()*1500;
+    obstacleInterval = setInterval(createObstacle, randomGap);
+}
+
+function moveObstacle(obstacle){
+
+    let move = setInterval(()=>{
+
+        if(gameOver){
+            clearInterval(move);
+            return;
+        }
+
+        let right = parseInt(obstacle.style.right);
+        obstacle.style.right = right + speed + "px";
+
+        if(checkCollision(juni, obstacle)){
+
+            obstacle.src = "obstacle_angry.png";
+            clearInterval(move);
+            endGame();
+        }
+
+        if(right > window.innerWidth){
+            clearInterval(move);
+            obstacle.remove();
+        }
+
+    },20);
+}
+
+function checkCollision(a, b){
+
+    const rect1 = a.getBoundingClientRect();
+    const rect2 = b.getBoundingClientRect();
+
+    return !(
+        rect1.top > rect2.bottom ||
+        rect1.bottom < rect2.top ||
+        rect1.right < rect2.left ||
+        rect1.left > rect2.right
+    );
 }
     
 function endGame(){
@@ -446,14 +532,53 @@ document.addEventListener("touchend", e=>{
 
 });
 
+let jumpLevel = 0;
+let isSliding = false;
+
 function jump(){
-    juni.style.bottom="150px";
-    setTimeout(()=>{ juni.style.bottom="0px"; },300);
+
+    if(gameOver) return;
+    if(jumpLevel >= 2) return;
+
+    jumpLevel++;
+    isJumping = true;
+
+    juni.src = "juni_jump.png";
+
+    let height = parseInt(juni.style.bottom) || 0;
+    let maxHeight = jumpLevel === 1 ? 120 : 220;
+
+    let up = setInterval(()=>{
+        height += 8;
+        juni.style.bottom = height + "px";
+
+        if(height >= maxHeight){
+
+            clearInterval(up);
+
+            let down = setInterval(()=>{
+                height -= 8;
+                juni.style.bottom = height + "px";
+
+                if(height <= 0){
+                    height = 0;
+                    juni.style.bottom = "0px";
+                    jumpLevel = 0;
+                    isJumping = false;
+                    juni.src = "juni.png";
+                    clearInterval(down);
+                }
+
+            },20);
+
+        }
+
+    },20);
 }
-    let isSliding = false;
 
 function slide(){
 
+    if(gameOver) return;
     if(isSliding) return;
 
     isSliding = true;
@@ -466,7 +591,6 @@ function slide(){
         juni.style.height = "80px";
         isSliding = false;
     },500);
-
 }
 
 </script>
