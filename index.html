@@ -365,44 +365,125 @@ document.addEventListener("keydown",e=>{
         else{ jump(); }
     }
 });
+let jumpLevel = 0;
+let isSliding = false;
+
+/* 키보드 */
+document.addEventListener("keydown", e => {
+  if(gameOver) return;
+
+  if(e.key === "ArrowUp"){
+    jump();
+  }
+
+  if(e.key === "ArrowDown"){
+    slide();
+  }
+});
+
+/* 모바일 스와이프 */
+let startY = 0;
+
+document.addEventListener("touchstart", e=>{
+  startY = e.touches[0].clientY;
+});
+
+document.addEventListener("touchend", e=>{
+  let diff = e.changedTouches[0].clientY - startY;
+
+  if(diff < -40) jump();      // 위로 스와이프
+  if(diff > 40) slide();      // 아래로 스와이프
+});
 
 function jump(){
-    if(gameOver)return;
+  if(jumpLevel >= 2) return;
 
-    let height=0;
-    let up=setInterval(()=>{
-        if(height>=130){
-            clearInterval(up);
-            let down=setInterval(()=>{
-                if(height<=0) clearInterval(down);
-                height-=6;
-                juni.style.bottom=height+"px";
-            },20);
+  jumpLevel++;
+
+  let height = 0;
+  let maxHeight = jumpLevel === 1 ? 120 : 220;
+
+  let up = setInterval(()=>{
+    if(height >= maxHeight){
+      clearInterval(up);
+
+      let down = setInterval(()=>{
+        height -= 8;
+        if(height <= 0){
+          height = 0;
+          jumpLevel = 0;
+          clearInterval(down);
         }
-        height+=6;
-        juni.style.bottom=height+"px";
-    },20);
+        juni.style.bottom = height + "px";
+      },20);
+    }
+
+    height += 8;
+    juni.style.bottom = height + "px";
+
+  },20);
 }
+    
+function slide(){
+  if(isSliding) return;
 
+  isSliding = true;
+  juni.src = "juni_slide.png";
+
+  setTimeout(()=>{
+    juni.src = "juni.png";
+    isSliding = false;
+  },500);
+}
+    
 function createObstacle(){
-    let obstacle=document.createElement("img");
-    obstacle.src="obstacle1.png";
-    obstacle.style.width="60px";
-    obstacle.className="obstacle";
-    obstacle.style.left=game.offsetWidth+"px";
-    game.appendChild(obstacle);
 
-    let move=setInterval(()=>{
-        if(gameOver){clearInterval(move);return;}
+  let obstacle = document.createElement("img");
+  let rand = Math.random();
 
-        let jr=juni.getBoundingClientRect();
-        let or=obstacle.getBoundingClientRect();
+  if(rand < 0.4){
+    obstacle.src = "obstacle1.png";
+    obstacle.style.width = "50px";
+    obstacle.dataset.type = "jump1";
+  }
+  else if(rand < 0.7){
+    obstacle.src = "obstacle1.png";
+    obstacle.style.width = "90px";
+    obstacle.dataset.type = "jump2";
+  }
+  else{
+    obstacle.src = "obstacle_slice.png";
+    obstacle.style.width = "70px";
+    obstacle.dataset.type = "slice";
+  }
 
-        if(jr.right-20>or.left+15 &&
-           jr.left+20<or.right-15 &&
-           jr.bottom-10>or.top+10){
+  obstacle.className="obstacle";
+  obstacle.style.left = game.offsetWidth + "px";
+  game.appendChild(obstacle);
 
-            gameOver=true;
+  let passed = false;
+
+  let move = setInterval(()=>{
+
+    if(gameOver){ clearInterval(move); return; }
+
+    let jr = juni.getBoundingClientRect();
+    let or = obstacle.getBoundingClientRect();
+
+    if(jr.right-20 > or.left+15 && jr.left+20 < or.right-15){
+
+      if(obstacle.dataset.type === "slice"){
+        if(!isSliding) gameOver = true;
+      }
+
+      if(obstacle.dataset.type === "jump1"){
+        if(jumpLevel < 1) gameOver = true;
+      }
+
+      if(obstacle.dataset.type === "jump2"){
+        if(jumpLevel < 2) gameOver = true;
+      }{ 
+        gameOver=true;
             clearInterval(obstacleInterval);
             clearInterval(timerInterval);
             alert("게임오버! 스페이스로 재시작");
@@ -416,6 +497,28 @@ function createObstacle(){
         }
     },20);
 }
+
+    if(!passed && obstacle.offsetLeft < juni.offsetLeft){
+      coin++;
+      scoreBoard.innerHTML = "Time: "+time+"s | Coin: "+coin;
+      passed = true;
+    }
+
+    obstacle.style.left = obstacle.offsetLeft - speed + "px";
+
+    if(obstacle.offsetLeft < -120){
+      obstacle.remove();
+      clearInterval(move);
+    }
+
+  },20);
+
+  /* 🔥 랜덤 간격 */
+  let delay = 1000 + Math.random()*1500;
+  setTimeout(createObstacle, delay);
+}
+
+           
 </script>
 
 </body>
