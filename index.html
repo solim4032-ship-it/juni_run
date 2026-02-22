@@ -37,7 +37,16 @@ button:hover{
     background-size:cover;
     overflow:hidden;
 }
-
+     
+#juniText{
+    position:absolute;
+    top:20%;
+    left:50%;
+    transform:translateX(-50%);
+    width:600px;
+    z-index:4; /* floatingJuni(2)보다 위 */
+}
+    
 #startButtons{
     position:absolute;
     bottom:60px;
@@ -146,6 +155,9 @@ input{
 
 <!-- 시작화면 -->
 <div id="startScreen">
+   
+  <img id="juniText" src="juni_text.png">
+    
   <div id="startButtons">
     <button id="loginBtn" onclick="showLogin()">Login</button>
     <button onclick="openMenu()">게임하기</button>
@@ -206,7 +218,8 @@ const loginPw = document.getElementById("loginPw");
 
 /* ================= 떠다니는 준이 ================= */
 function createFloatingJunis(){
-    for(let i=0;i<5;i++){
+    for(let i=0;i<7;i++){
+
         let img=document.createElement("img");
         img.src="juni.png";
         img.className="floatingJuni";
@@ -214,21 +227,47 @@ function createFloatingJunis(){
 
         let x=Math.random()*window.innerWidth;
         let y=Math.random()*window.innerHeight;
-        let speedX=(Math.random()-0.5)*3;
-        let speedY=(Math.random()-0.5)*3;
 
+        let speedX=(Math.random()-0.5)*2;
+        let speedY=(Math.random()-0.5)*2;
+
+        let rotation=Math.random()*360;
+        let rotationSpeed=(Math.random()-0.5)*2;
+
+        let revertTimeout=null;
+
+        /* ===== 클릭 시 하트 변신 ===== */
+        function changeToHeart(){
+            img.src="juni_heart.png";
+
+            clearTimeout(revertTimeout);
+            revertTimeout=setTimeout(()=>{
+                img.src="juni.png";
+            },3000);
+        }
+
+        img.addEventListener("click",changeToHeart);
+        img.addEventListener("touchstart",changeToHeart);
+
+        /* ===== 애니메이션 ===== */
         function animate(){
+
             x+=speedX;
             y+=speedY;
+            rotation+=rotationSpeed;
 
-            if(x>window.innerWidth) x=0;
-            if(x<0) x=window.innerWidth;
-            if(y>window.innerHeight) y=0;
-            if(y<0) y=window.innerHeight;
+            /* 화면 밖 나가면 반대편으로 */
+            if(x>window.innerWidth+150) x=-150;
+            if(x<-150) x=window.innerWidth+150;
+            if(y>window.innerHeight+150) y=-150;
+            if(y<-150) y=window.innerHeight+150;
 
-            img.style.transform=`translate(${x}px,${y}px)`;
+            img.style.transform=
+                `translate(${x}px,${y}px) rotate(${rotation}deg)`;
+
             requestAnimationFrame(animate);
         }
+
         animate();
     }
 }
