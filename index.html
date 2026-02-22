@@ -367,6 +367,8 @@ let time=0;
 let coin=0;
 let gameOver=false;
 let timerInterval;
+let speed = 6;
+let obstacleInterval;
 
 function resetGame(){
     gameOver=false;
@@ -534,6 +536,7 @@ document.addEventListener("touchend", e=>{
 
 let jumpLevel = 0;
 let isSliding = false;
+let isJumping = false;
 
 function jump(){
 
