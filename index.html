@@ -148,6 +148,18 @@ input{
     color:white;
     text-shadow:2px 2px 5px black;
 }
+
+#gameOverText{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-size:28px;
+    color:white;
+    text-shadow:2px 2px 8px black;
+    display:none;
+    text-align:center;
+}
 </style>
 </head>
 
@@ -195,6 +207,7 @@ input{
     <button class="topBack" onclick="backToMenu()">뒤로</button>
     <div id="game">
         <div id="scoreBoard">Time: 0s</div>
+        <div id="gameOverText"></div>
         <img id="juni" src="juni.png">
     </div>
 </div>
@@ -210,6 +223,7 @@ const gameWrapper = document.getElementById("gameWrapper");
 const game = document.getElementById("game");
 const juni = document.getElementById("juni");
 const scoreBoard = document.getElementById("scoreBoard");
+const gameOverText = document.getElementById("gameOverText");
 const loginBtn = document.getElementById("loginBtn");
 const welcomeText = document.getElementById("welcomeText");
 const coinText = document.getElementById("coinText");
@@ -359,6 +373,7 @@ function resetGame(){
     time=0;
     coin=0;
     scoreBoard.innerHTML="Time: 0s | Coin: 0";
+    gameOverText.style.display = "none";
 
     clearInterval(timerInterval);
     timerInterval=setInterval(()=>{
@@ -367,16 +382,91 @@ function resetGame(){
         scoreBoard.innerHTML="Time: "+time+"s | Coin: "+coin;
     },1000);
 }
+    
+function endGame(){
 
-document.addEventListener("keydown",e=>{
-    if(e.code==="Space"){
+    gameOver = true;
+    clearInterval(timerInterval);
+
+    gameOverText.style.display = "block";
+
+    if(window.innerWidth > 768){
+        gameOverText.innerHTML =
+        "게임 오버<br><br>스페이스를 눌러 다시 시작하기";
+    }else{
+        gameOverText.innerHTML =
+        "게임 오버<br><br>화면을 터치해 다시 시작하기";
+    }
+}
+
+/* ================= 키보드 조작 ================= */
+document.addEventListener("keydown", e => {
+
+    if(gameOver){
+
+        if(e.code === "Space"){
+            resetGame();
+        }
+
+        return;
+    }
+
+    if(e.code === "ArrowUp"){
         jump();
     }
+
+    if(e.code === "ArrowDown"){
+        slide();
+    }
+
+});
+    /* ================= 모바일 스와이프 ================= */
+let startY = 0;
+
+document.addEventListener("touchstart", e=>{
+    startY = e.touches[0].clientY;
+});
+
+document.addEventListener("touchend", e=>{
+
+    if(gameOver){
+        resetGame();
+        return;
+    }
+
+    let diff = e.changedTouches[0].clientY - startY;
+
+    if(diff < -40){
+        jump();      // 위로 스와이프
+    }
+
+    if(diff > 40){
+        slide();     // 아래로 스와이프
+    }
+
 });
 
 function jump(){
     juni.style.bottom="150px";
     setTimeout(()=>{ juni.style.bottom="0px"; },300);
+}
+    let isSliding = false;
+
+function slide(){
+
+    if(isSliding) return;
+
+    isSliding = true;
+
+    juni.src = "juni_slide.png";
+    juni.style.height = "50px";
+
+    setTimeout(()=>{
+        juni.src = "juni.png";
+        juni.style.height = "80px";
+        isSliding = false;
+    },500);
+
 }
 
 </script>
