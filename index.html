@@ -31,6 +31,13 @@ body {
     background: linear-gradient(#8fd3f4, #84fab0);
 }
 
+/* 로그인 영역 */
+#loginArea{
+    position:absolute;
+    top:20px;
+    right:20px;
+}
+
 button {
     padding: 12px 35px;
     font-size: 22px;
@@ -75,10 +82,10 @@ button {
     text-shadow: 2px 2px 5px black;
 }
 
-/* 랭킹 */
-#rankingScreen {
-    display: none;
-    background: linear-gradient(#a1c4fd, #c2e9fb);
+/* 로그인 화면 */
+#loginScreen {
+    display:none;
+    background:#dfe9f3;
 }
 
 input {
@@ -86,43 +93,11 @@ input {
     font-size: 18px;
     margin: 5px;
 }
-#bestScoreBoard{
-    position:absolute;
-    top:50px;
-    left:20px;
-    font-size:22px;
-    color:white;
-    text-shadow:2px 2px 5px black;
-}
 
-#backBtn{
-    position:absolute;
-    top:15px;
-    right:20px;
-    font-size:18px;
-    padding:6px 15px;
-}
-
-#rankingList {
-    margin-top: 20px;
-    width: 300px;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.rankItem {
-    padding: 8px;
-    margin: 5px 0;
-    background: white;
-    border-radius: 8px;
-    font-size: 18px;
-}
-
-.highlight {
-    background: gold;
-    font-size: 22px;
-    font-weight: bold;
-    border: 3px solid red;
+/* 유저 화면 */
+#userScreen{
+    display:none;
+    background:#f6d365;
 }
 </style>
 </head>
@@ -131,33 +106,39 @@ input {
 
 <!-- 시작 화면 -->
 <div id="startScreen" class="screen">
-    <h2>여자친구를 밟지 않게 조심하자!</h2>
+
+    <div id="loginArea">
+        <button id="loginBtn" onclick="showLogin()">Login</button>
+    </div>
+
     <h1 style="font-size:70px;">Juni Run</h1>
-    <button onclick="startGame()">시작하기</button>
-    <button onclick="openRanking()">랭킹</button>
+    <button onclick="startGame()">Juni Run</button>
+</div>
+
+<!-- 로그인 화면 -->
+<div id="loginScreen" class="screen">
+    <h2>회원가입 / 로그인</h2>
+    <input id="loginName" placeholder="이름">
+    <input id="loginPw" type="password" placeholder="비밀번호">
+    <button onclick="loginUser()">확인</button>
+    <button onclick="backToStart()">Back</button>
+</div>
+
+<!-- 유저 전용 화면 -->
+<div id="userScreen" class="screen">
+    <h1 id="welcomeText"></h1>
+    <p>준이와 함께 최고 기록을 경신하세요 🐶</p>
+    <button onclick="goHome()">홈으로</button>
 </div>
 
 <!-- 게임 -->
 <div id="game">
     <div id="scoreBoard">Time: 0s</div>
-    <div id="bestScoreBoard">Best: 0s</div>
-    <button id="backBtn" onclick="backToStart()">Back</button>
     <img id="juni" src="juni.png">
-</div>
-
-<!-- 랭킹 화면 -->
-<div id="rankingScreen" class="screen">
-    <h1>랭킹</h1>
-    <input id="username" placeholder="이름">
-    <input id="password" placeholder="비밀번호(숫자만)" type="password" inputmode="numeric">
-    <button onclick="login()">확인</button>
-    <div id="rankingList"></div>
-    <button onclick="goBack()">Back</button>
 </div>
 
 <script>
 let currentUser = null;
-let bestTime = 0;
 let time = 0;
 let speed = 6;
 let gameOver = false;
@@ -166,85 +147,69 @@ let obstacleInterval, timerInterval;
 const game = document.getElementById("game");
 const juni = document.getElementById("juni");
 const scoreBoard = document.getElementById("scoreBoard");
-const bestScoreBoard = document.getElementById("bestScoreBoard");
 
+/* ================= 로그인 시스템 ================= */
 
-/* 화면 전환 */
-function startGame(){
+function showLogin(){
     document.getElementById("startScreen").style.display="none";
-    game.style.display="block";
-
-    bestScoreBoard.innerHTML = "Best: " + bestTime + "s";
-
-    resetGame();
+    document.getElementById("loginScreen").style.display="flex";
 }
 
-function openRanking(){
-    document.getElementById("startScreen").style.display="none";
-    document.getElementById("rankingScreen").style.display="flex";
-}
+function loginUser(){
+    let name = document.getElementById("loginName").value.trim();
+    let pw = document.getElementById("loginPw").value.trim();
 
-function goBack(){
-    document.getElementById("rankingScreen").style.display="none";
-    document.getElementById("startScreen").style.display="flex";
-}
-
-/* 로그인 */
-function login(){
-    let name = document.getElementById("username").value.trim();
-    let pw = document.getElementById("password").value.trim();
-
-    if(!/^[0-9]+$/.test(pw)){
-        alert("비밀번호는 숫자만 가능합니다.");
+    if(name === "" || pw === ""){
+        alert("이름과 비밀번호를 입력하세요.");
         return;
     }
 
     let users = JSON.parse(localStorage.getItem("users") || "{}");
 
-    if(users[name]){
-        if(users[name].pw !== pw){
-            alert("비밀번호가 틀렸습니다.");
-            return;
-        }
-    } else {
-        users[name] = { pw: pw, best: 0 };
+    if(users[name] && users[name] !== pw){
+        alert("이미 존재하는 이름입니다.");
+        return;
+    }
+
+    if(!users[name]){
+        users[name] = pw;
+        localStorage.setItem("users", JSON.stringify(users));
     }
 
     currentUser = name;
-    bestTime = users[name].best;
-    localStorage.setItem("users", JSON.stringify(users));
 
-    showOnlineRanking();
+    document.getElementById("loginArea").innerHTML =
+        `<button onclick="openUserScreen()">🏠</button>`;
+
+    document.getElementById("loginScreen").style.display="none";
+    document.getElementById("startScreen").style.display="flex";
 }
 
-/* 랭킹 표시 */
-function showRanking(){
-    let users = JSON.parse(localStorage.getItem("users") || "{}");
-    let arr = [];
-
-    for(let name in users){
-        arr.push({name:name, best:users[name].best});
-    }
-
-    arr.sort((a,b)=>b.best-a.best);
-
-    let list = document.getElementById("rankingList");
-    list.innerHTML="";
-
-    arr.forEach((u,i)=>{
-        let div = document.createElement("div");
-        div.className="rankItem";
-        div.innerHTML=(i+1)+"등 - "+u.name+" : "+u.best+"s";
-
-        if(u.name===currentUser){
-            div.classList.add("highlight");
-        }
-
-        list.appendChild(div);
-    });
+function openUserScreen(){
+    document.getElementById("startScreen").style.display="none";
+    document.getElementById("userScreen").style.display="flex";
+    document.getElementById("welcomeText").innerHTML =
+        currentUser + "님 환영합니다!";
 }
 
-/* 점프 */
+function goHome(){
+    document.getElementById("userScreen").style.display="none";
+    document.getElementById("startScreen").style.display="flex";
+}
+
+function backToStart(){
+    document.getElementById("loginScreen").style.display="none";
+    document.getElementById("startScreen").style.display="flex";
+}
+
+/* ================= 게임 ================= */
+
+function startGame(){
+    document.getElementById("startScreen").style.display="none";
+    game.style.display="block";
+    resetGame();
+}
+
 document.addEventListener("keydown", e=>{
     if(e.code==="Space"){
         if(gameOver){
@@ -254,17 +219,8 @@ document.addEventListener("keydown", e=>{
         }
     }
 });
-game.addEventListener("touchstart", function(e){
-    e.preventDefault();
 
-    if(gameOver){
-        resetGame(); 
-    } else {
-        jump();      
-    }
-});
 game.addEventListener("click", function(){
-
     if(gameOver){
         resetGame();
     } else {
@@ -275,7 +231,7 @@ game.addEventListener("click", function(){
 function jump(){
     if(gameOver) return;
 
-    juni.src = "juni_jump.png";  
+    juni.src = "juni_jump.png";
 
     let height=0;
     let up=setInterval(()=>{
@@ -295,18 +251,10 @@ function jump(){
     },20);
 }
 
-/* 장애물 */
 function createObstacle(){
     let obstacle=document.createElement("img");
-
-    if(time>=30 && Math.random()<0.25){
-        obstacle.src="obstacle2.png";
-        obstacle.style.width="80px";
-    } else {
-        obstacle.src="obstacle1.png";
-        obstacle.style.width="60px";
-    }
-
+    obstacle.src="obstacle1.png";
+    obstacle.style.width="60px";
     obstacle.className="obstacle";
     obstacle.style.left=game.offsetWidth+"px";
     game.appendChild(obstacle);
@@ -317,21 +265,18 @@ function createObstacle(){
         let jr=juni.getBoundingClientRect();
         let or=obstacle.getBoundingClientRect();
 
-        if(jr.right-20>or.left+15 && jr.left+20<or.right-15 && jr.bottom-10>or.top+10){
+        if(jr.right-20>or.left+15 &&
+           jr.left+20<or.right-15 &&
+           jr.bottom-10>or.top+10){
 
-    obstacle.src = "obstacle2.png";  
+            gameOver=true;
+            clearInterval(obstacleInterval);
+            clearInterval(timerInterval);
 
-    gameOver=true;
-    clearInterval(obstacleInterval);
-    clearInterval(timerInterval);
-
-    saveScore();
-    saveOnlineScore(currentUser, time);
-
-    setTimeout(()=>{
-        alert("게임오버! 스페이스로 재시작");
-    },200);
-}
+            setTimeout(()=>{
+                alert("게임오버! 스페이스로 재시작");
+            },200);
+        }
 
         obstacle.style.left=obstacle.offsetLeft-speed+"px";
 
@@ -342,20 +287,6 @@ function createObstacle(){
     },20);
 }
 
-/* 점수 저장 */
-function saveScore(){
-    if(!currentUser) return;
-
-    let users=JSON.parse(localStorage.getItem("users"));
-    if(time>users[currentUser].best){
-    users[currentUser].best=time;
-    bestTime=time;
-    bestScoreBoard.innerHTML = "Best: " + bestTime + "s";
-    localStorage.setItem("users",JSON.stringify(users));
-}
-}
-
-/* 게임 리셋 */
 function resetGame(){
     document.querySelectorAll(".obstacle").forEach(o=>o.remove());
     gameOver=false;
@@ -369,84 +300,6 @@ function resetGame(){
         speed+=0.2;
         scoreBoard.innerHTML="Time: "+time+"s";
     },1000);
-}
-function backToStart(){
-    clearInterval(obstacleInterval);
-    clearInterval(timerInterval);
-    game.style.display="none";
-    document.getElementById("startScreen").style.display="flex";
-}
-    
-async function showOnlineRanking(){
-    let rankingData = await loadOnlineRanking();
-
-    let bestScores = {};
-
-    rankingData.forEach(user=>{
-        if(!bestScores[user.name] || user.score > bestScores[user.name]){
-            bestScores[user.name] = user.score;
-        }
-    });
-
-    let finalArray = [];
-    for(let name in bestScores){
-        finalArray.push({name:name, score:bestScores[name]});
-    }
-
-    finalArray.sort((a,b)=>b.score-a.score);
-
-    let list = document.getElementById("rankingList");
-    list.innerHTML="<h2>🏆 온라인 랭킹</h2>";
-
-    finalArray.forEach((user,index)=>{
-        let div=document.createElement("div");
-        div.className="rankItem";
-        div.innerHTML=(index+1)+"등 - "+user.name+" : "+user.score+"s";
-
-        if(user.name===currentUser){
-            div.classList.add("highlight");
-        }
-
-        list.appendChild(div);
-    });
-}
-
-    
-</script>
-
-    <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyC-GTDH9GtM0lZOfgpAGwIzqUJPvy12C80",
-  authDomain: "juni-run.firebaseapp.com",
-  projectId: "juni-run",
-  storageBucket: "juni-run.firebasestorage.app",
-  messagingSenderId: "349465222596",
-  appId: "1:349465222596:web:05fa5296fa769e4d415891",
-  measurementId: "G-KSMBMZKC2N"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-window.saveOnlineScore = async function(name, score){
-    await addDoc(collection(db, "ranking"), {
-        name: name,
-        score: score,
-        created: Date.now()
-    });
-}
-
-window.loadOnlineRanking = async function(){
-    const q = query(collection(db, "ranking"), orderBy("score", "desc"));
-    const querySnapshot = await getDocs(q);
-    let result = [];
-    querySnapshot.forEach((doc) => {
-        result.push(doc.data());
-    });
-    return result;
 }
 </script>
 
