@@ -64,6 +64,34 @@ button:hover{
     z-index:4;
 }
 
+#loginBtn{
+    position:absolute;
+    top:20px;
+    left:20px;
+    z-index:4;
+}
+
+/* ================= 로그인 화면 ================= */
+
+.screen{
+    position:fixed;
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+#loginScreen{ display:none; background:#dfe9f3; }
+#userScreen{ display:none; background:#f6d365; }
+
+input{
+    padding:10px;
+    font-size:18px;
+    margin:5px;
+}
+
 /* ================= 게임 선택 화면 ================= */
 
 #menuScreen{
@@ -143,7 +171,23 @@ button:hover{
 <!-- 시작화면 -->
 <div id="startScreen">
     <img src="juni_text.png" id="titleImage">
+    <button id="loginBtn" onclick="showLogin()">Login</button>
     <button id="startBtn" onclick="openMenu()">게임하기</button>
+</div>
+
+<!-- 로그인 -->
+<div id="loginScreen" class="screen">
+    <h2>회원가입 / 로그인</h2>
+    <input id="loginName" placeholder="이름">
+    <input id="loginPw" type="password" placeholder="비밀번호">
+    <button onclick="loginUser()">확인</button>
+    <button onclick="goHome()">Back</button>
+</div>
+
+<!-- 유저 화면 -->
+<div id="userScreen" class="screen">
+    <h1 id="welcomeText"></h1>
+    <button onclick="goHome()">홈으로</button>
 </div>
 
 <!-- 게임 선택 화면 -->
@@ -183,13 +227,18 @@ function createFloatingJunis(){
         let rotation=Math.random()*360;
         let rotationSpeed=(Math.random()-0.5)*5;
 
-        img.addEventListener("click",()=>{
-            img.src = img.src.includes("juni_heart.png") ? "juni.png" : "juni_heart.png";
-        });
+        let revertTimeout=null;
 
-        img.addEventListener("touchstart",()=>{
-            img.src = img.src.includes("juni_heart.png") ? "juni.png" : "juni_heart.png";
-        });
+        function changeToHeart(){
+            img.src="juni_heart.png";
+            clearTimeout(revertTimeout);
+            revertTimeout=setTimeout(()=>{
+                img.src="juni.png";
+            },3000);
+        }
+
+        img.addEventListener("click",changeToHeart);
+        img.addEventListener("touchstart",changeToHeart);
 
         function animate(){
             x+=speedX;
@@ -208,6 +257,50 @@ function createFloatingJunis(){
     }
 }
 createFloatingJunis();
+
+/* ================= 로그인 시스템 ================= */
+
+let currentUser=null;
+
+function showLogin(){
+    startScreen.style.display="none";
+    loginScreen.style.display="flex";
+}
+
+function loginUser(){
+    let name=loginName.value.trim();
+    let pw=loginPw.value.trim();
+    if(!name||!pw){ alert("이름과 비밀번호 입력"); return; }
+
+    let users=JSON.parse(localStorage.getItem("users")||"{}");
+
+    if(users[name]&&users[name]!==pw){
+        alert("이미 존재하는 이름");
+        return;
+    }
+
+    if(!users[name]){
+        users[name]=pw;
+        localStorage.setItem("users",JSON.stringify(users));
+    }
+
+    currentUser=name;
+    loginBtn.innerText="🏠";
+    loginBtn.onclick=openUserScreen;
+    goHome();
+}
+
+function openUserScreen(){
+    startScreen.style.display="none";
+    userScreen.style.display="flex";
+    welcomeText.innerText=currentUser+"님 환영합니다!";
+}
+
+function goHome(){
+    loginScreen.style.display="none";
+    userScreen.style.display="none";
+    startScreen.style.display="block";
+}
 
 /* ================= 화면 전환 ================= */
 
@@ -233,7 +326,7 @@ function backToMenu(){
     menuScreen.style.display="block";
 }
 
-/* ================= 게임 ================= */
+/* ================= 게임 로직 (원본 유지) ================= */
 
 let time=0;
 let speed=6;
