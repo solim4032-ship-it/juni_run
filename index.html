@@ -5,99 +5,136 @@
 <title>Juni Run</title>
 
 <style>
-body {
-    margin: 0;
-    background: #87CEEB;
+body{
+    margin:0;
+    overflow:hidden;
     font-family: Arial Black, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
 }
 
-/* 공통 화면 */
-.screen {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+/* ================= 시작화면 ================= */
+
+#startScreen{
+    position:relative;
+    width:100vw;
+    height:100vh;
+    background:url("start_bg.png") no-repeat center center;
+    background-size:cover;
+    overflow:hidden;
 }
 
-/* 시작 화면 */
-#startScreen {
-    background: linear-gradient(#8fd3f4, #84fab0);
-}
-
-/* 로그인 영역 */
-#loginArea{
+/* JUNI 문구 (최상단) */
+#titleImage{
     position:absolute;
-    top:20px;
-    right:20px;
+    top:20%;
+    left:50%;
+    transform:translateX(-50%);
+    width:700px;
+    z-index:3;
 }
 
-button {
-    padding: 12px 35px;
-    font-size: 22px;
-    font-weight: bold;
-    margin: 10px;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
+/* 움직이는 준이 */
+.floatingJuni{
+    position:absolute;
+    width:120px;
+    pointer-events:none;
+    z-index:2;
+    animation: spin 6s linear infinite;
 }
 
-/* 게임 */
-#game {
-    display: none;
-    width: 100vw;
-    max-width: 1200px;
-    height: 450px;
-    background: url("background.png") no-repeat center center;
-    background-size: cover;
-    position: relative;
-    overflow: hidden;
-    border-radius: 20px;
+@keyframes spin{
+    from{ transform:rotate(0deg); }
+    to{ transform:rotate(360deg); }
 }
 
-#juni {
-    width: 80px;
-    position: absolute;
-    bottom: 0;
-    left: 100px;
+/* 하단 버튼 영역 */
+#bottomUI{
+    position:absolute;
+    bottom:40px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:20px;
+    z-index:4;
 }
 
-.obstacle {
-    position: absolute;
-    bottom: 0;
+button{
+    padding:15px 40px;
+    font-size:22px;
+    border:none;
+    border-radius:20px;
+    cursor:pointer;
+    background:white;
+    transition:0.3s;
 }
 
-#scoreBoard {
-    position: absolute;
-    top: 15px;
-    left: 20px;
-    font-size: 24px;
-    color: white;
-    text-shadow: 2px 2px 5px black;
+button:hover{
+    transform:scale(1.1);
 }
 
-/* 로그인 화면 */
-#loginScreen {
+/* ================= 로그인 화면 ================= */
+
+.screen{
+    position:fixed;
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+#loginScreen{
     display:none;
     background:#dfe9f3;
 }
 
-input {
-    padding: 10px;
-    font-size: 18px;
-    margin: 5px;
-}
-
-/* 유저 화면 */
 #userScreen{
     display:none;
     background:#f6d365;
+}
+
+input{
+    padding:10px;
+    font-size:18px;
+    margin:5px;
+}
+
+/* ================= 게임 ================= */
+
+#game{
+    display:none;
+    width:100vw;
+    max-width:1200px;
+    height:450px;
+    background:url("background.png") no-repeat center center;
+    background-size:cover;
+    position:relative;
+    overflow:hidden;
+    margin:auto;
+    top:50%;
+    transform:translateY(-50%);
+    border-radius:20px;
+}
+
+#juni{
+    width:80px;
+    position:absolute;
+    bottom:0;
+    left:100px;
+}
+
+.obstacle{
+    position:absolute;
+    bottom:0;
+}
+
+#scoreBoard{
+    position:absolute;
+    top:15px;
+    left:20px;
+    font-size:24px;
+    color:white;
+    text-shadow:2px 2px 5px black;
 }
 </style>
 </head>
@@ -105,29 +142,29 @@ input {
 <body>
 
 <!-- 시작 화면 -->
-<div id="startScreen" class="screen">
+<div id="startScreen">
 
-    <div id="loginArea">
+    <img src="juni_text.png" id="titleImage">
+
+    <div id="bottomUI">
+        <button onclick="startGame()">게임하기</button>
         <button id="loginBtn" onclick="showLogin()">Login</button>
     </div>
 
-    <h1 style="font-size:70px;">Juni Run</h1>
-    <button onclick="startGame()">Juni Run</button>
 </div>
 
-<!-- 로그인 화면 -->
+<!-- 로그인 -->
 <div id="loginScreen" class="screen">
     <h2>회원가입 / 로그인</h2>
     <input id="loginName" placeholder="이름">
     <input id="loginPw" type="password" placeholder="비밀번호">
     <button onclick="loginUser()">확인</button>
-    <button onclick="backToStart()">Back</button>
+    <button onclick="goHome()">Back</button>
 </div>
 
-<!-- 유저 전용 화면 -->
+<!-- 유저 전용 -->
 <div id="userScreen" class="screen">
     <h1 id="welcomeText"></h1>
-    <p>준이와 함께 최고 기록을 경신하세요 🐶</p>
     <button onclick="goHome()">홈으로</button>
 </div>
 
@@ -138,17 +175,38 @@ input {
 </div>
 
 <script>
-let currentUser = null;
-let time = 0;
-let speed = 6;
-let gameOver = false;
-let obstacleInterval, timerInterval;
+/* ================= 움직이는 준이 생성 ================= */
 
-const game = document.getElementById("game");
-const juni = document.getElementById("juni");
-const scoreBoard = document.getElementById("scoreBoard");
+function createFloatingJunis(){
+    for(let i=0;i<7;i++){
+        let img=document.createElement("img");
+        img.src="juni.png";
+        img.className="floatingJuni";
+
+        img.style.top=Math.random()*80+"%";
+        img.style.left=Math.random()*90+"%";
+
+        document.getElementById("startScreen").appendChild(img);
+
+        moveRandom(img);
+    }
+}
+
+function moveRandom(el){
+    setInterval(()=>{
+        let x=Math.random()*90;
+        let y=Math.random()*80;
+        el.style.transition="8s linear";
+        el.style.left=x+"%";
+        el.style.top=y+"%";
+    },8000);
+}
+
+createFloatingJunis();
 
 /* ================= 로그인 시스템 ================= */
+
+let currentUser=null;
 
 function showLogin(){
     document.getElementById("startScreen").style.display="none";
@@ -156,53 +214,56 @@ function showLogin(){
 }
 
 function loginUser(){
-    let name = document.getElementById("loginName").value.trim();
-    let pw = document.getElementById("loginPw").value.trim();
+    let name=document.getElementById("loginName").value.trim();
+    let pw=document.getElementById("loginPw").value.trim();
 
-    if(name === "" || pw === ""){
-        alert("이름과 비밀번호를 입력하세요.");
+    if(name===""||pw===""){
+        alert("이름과 비밀번호 입력");
         return;
     }
 
-    let users = JSON.parse(localStorage.getItem("users") || "{}");
+    let users=JSON.parse(localStorage.getItem("users")||"{}");
 
-    if(users[name] && users[name] !== pw){
-        alert("이미 존재하는 이름입니다.");
+    if(users[name]&&users[name]!==pw){
+        alert("이미 존재하는 이름");
         return;
     }
 
     if(!users[name]){
-        users[name] = pw;
-        localStorage.setItem("users", JSON.stringify(users));
+        users[name]=pw;
+        localStorage.setItem("users",JSON.stringify(users));
     }
 
-    currentUser = name;
+    currentUser=name;
 
-    document.getElementById("loginArea").innerHTML =
-        `<button onclick="openUserScreen()">🏠</button>`;
+    document.getElementById("loginBtn").innerText="🏠";
+    document.getElementById("loginBtn").onclick=openUserScreen;
 
-    document.getElementById("loginScreen").style.display="none";
-    document.getElementById("startScreen").style.display="flex";
+    goHome();
 }
 
 function openUserScreen(){
     document.getElementById("startScreen").style.display="none";
     document.getElementById("userScreen").style.display="flex";
-    document.getElementById("welcomeText").innerHTML =
-        currentUser + "님 환영합니다!";
+    document.getElementById("welcomeText").innerText=currentUser+"님 환영합니다!";
 }
 
 function goHome(){
-    document.getElementById("userScreen").style.display="none";
-    document.getElementById("startScreen").style.display="flex";
-}
-
-function backToStart(){
     document.getElementById("loginScreen").style.display="none";
-    document.getElementById("startScreen").style.display="flex";
+    document.getElementById("userScreen").style.display="none";
+    document.getElementById("startScreen").style.display="block";
 }
 
 /* ================= 게임 ================= */
+
+let time=0;
+let speed=6;
+let gameOver=false;
+let obstacleInterval,timerInterval;
+
+const game=document.getElementById("game");
+const juni=document.getElementById("juni");
+const scoreBoard=document.getElementById("scoreBoard");
 
 function startGame(){
     document.getElementById("startScreen").style.display="none";
@@ -210,28 +271,15 @@ function startGame(){
     resetGame();
 }
 
-document.addEventListener("keydown", e=>{
+document.addEventListener("keydown",e=>{
     if(e.code==="Space"){
-        if(gameOver){
-            resetGame();
-        } else {
-            jump();
-        }
-    }
-});
-
-game.addEventListener("click", function(){
-    if(gameOver){
-        resetGame();
-    } else {
-        jump();
+        if(gameOver){ resetGame(); }
+        else{ jump(); }
     }
 });
 
 function jump(){
-    if(gameOver) return;
-
-    juni.src = "juni_jump.png";
+    if(gameOver)return;
 
     let height=0;
     let up=setInterval(()=>{
@@ -240,7 +288,6 @@ function jump(){
             let down=setInterval(()=>{
                 if(height<=0){
                     clearInterval(down);
-                    juni.src = "juni.png";
                 }
                 height-=6;
                 juni.style.bottom=height+"px";
@@ -272,10 +319,7 @@ function createObstacle(){
             gameOver=true;
             clearInterval(obstacleInterval);
             clearInterval(timerInterval);
-
-            setTimeout(()=>{
-                alert("게임오버! 스페이스로 재시작");
-            },200);
+            alert("게임오버! 스페이스로 재시작");
         }
 
         obstacle.style.left=obstacle.offsetLeft-speed+"px";
