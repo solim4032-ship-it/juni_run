@@ -371,7 +371,7 @@ let speed = 6;
 let obstacleInterval;
 /* ===== 물리 엔진 변수 ===== */
 let velocityY = 0;
-let gravity = 0.5;
+let gravity = 0.4;
 let jumpPower = -14;
 let ground = 0;
 
@@ -442,7 +442,7 @@ function createObstacle(){
 
     if(type === "jump"){
         obstacle.src = "obstacle1.png";
-        obstacle.style.height = "70px";
+        obstacle.style.height = "65px";
         obstacle.style.bottom = "0px";
         obstacle.dataset.type = "jump";
     }
