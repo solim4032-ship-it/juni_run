@@ -421,7 +421,6 @@ obstacleInterval = setInterval(createObstacle, 1500);
     clearInterval(timerInterval);
     timerInterval=setInterval(()=>{
     time++;
-    coin++;
     speed += 0.2;
     scoreBoard.innerHTML=
     "Time: "+time+"s | Coin: "+coin;
@@ -493,9 +492,14 @@ function moveObstacle(obstacle){
         }
 
         if(right > window.innerWidth){
-            clearInterval(move);
-            obstacle.remove();
-        }
+
+    coin++;   // 🔥 장애물 통과 성공
+    scoreBoard.innerHTML =
+    "Time: "+time+"s | Coin: "+coin;
+
+    clearInterval(move);
+    obstacle.remove();
+}
 
     },20);
 }
