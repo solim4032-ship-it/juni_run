@@ -369,6 +369,39 @@ let gameOver=false;
 let timerInterval;
 let speed = 6;
 let obstacleInterval;
+/* ===== 물리 엔진 변수 ===== */
+let velocityY = 0;
+let gravity = 0.8;
+let jumpPower = -15;
+let ground = 0;
+
+let isJumping = false;
+let isSliding = false;
+
+/* ===== 물리 루프 ===== */
+function physicsLoop(){
+
+    if(gameOver) return;
+
+    velocityY += gravity;
+
+    let currentBottom = parseInt(juni.style.bottom) || 0;
+    currentBottom -= velocityY;
+
+    if(currentBottom <= ground){
+        currentBottom = ground;
+        velocityY = 0;
+        isJumping = false;
+
+        if(!isSliding){
+            juni.src = "juni.png";
+        }
+    }
+
+    juni.style.bottom = currentBottom + "px";
+
+    requestAnimationFrame(physicsLoop);
+}
 
 function resetGame(){
     gameOver=false;
@@ -377,6 +410,11 @@ function resetGame(){
     scoreBoard.innerHTML="Time: 0s | Coin: 0";
     gameOverText.style.display = "none";
     speed = 6;
+juni.style.bottom = "0px";
+velocityY = 0;
+isJumping = false;
+isSliding = false;
+physicsLoop();
 clearInterval(obstacleInterval);
 obstacleInterval = setInterval(createObstacle, 1500);
 
@@ -384,7 +422,7 @@ obstacleInterval = setInterval(createObstacle, 1500);
     timerInterval=setInterval(()=>{
     time++;
     coin++;
-    speed += 0.3;   
+    speed += 0.2;
     scoreBoard.innerHTML=
     "Time: "+time+"s | Coin: "+coin;
 
@@ -398,39 +436,33 @@ function createObstacle(){
     const obstacle = document.createElement("img");
     obstacle.classList.add("obstacle");
 
-    let type = Math.floor(Math.random()*3);
+    let type = Math.random() < 0.5 ? "jump" : "slide";
 
-    if(type === 0){
-        obstacle.src = "obstacle_jump.png"; // 1단 점프
-        obstacle.style.height = "60px";
-        obstacle.dataset.type = "jump1";
-    }
-    else if(type === 1){
-        obstacle.src = "obstacle_high.png"; // 2단 점프
-        obstacle.style.height = "120px";
-        obstacle.dataset.type = "jump2";
+    if(type === "jump"){
+        obstacle.src = "obstacle1.png";
+        obstacle.style.height = "70px";
+        obstacle.style.bottom = "0px";
+        obstacle.dataset.type = "jump";
     }
     else{
-        obstacle.src = "obstacle_slide.png"; // 슬라이딩
-        obstacle.style.height = "80px";
+        obstacle.src = "obstacle_slice.png";
+        obstacle.style.height = "70px";
         obstacle.style.bottom = "80px";
         obstacle.dataset.type = "slide";
     }
 
     obstacle.style.position = "absolute";
-    obstacle.style.right = "-60px";
-    obstacle.style.bottom = obstacle.style.bottom || "0px";
+    obstacle.style.right = "-80px";
 
     game.appendChild(obstacle);
 
     moveObstacle(obstacle);
 
-    // 다음 장애물 간격 랜덤
     clearInterval(obstacleInterval);
-    let randomGap = 1000 + Math.random()*1500;
+    let randomGap = 1200 + Math.random()*1500;
     obstacleInterval = setInterval(createObstacle, randomGap);
 }
-
+    
 function moveObstacle(obstacle){
 
     let move = setInterval(()=>{
@@ -445,7 +477,17 @@ function moveObstacle(obstacle){
 
         if(checkCollision(juni, obstacle)){
 
-            obstacle.src = "obstacle_angry.png";
+            let type = obstacle.dataset.type;
+
+            if(type === "jump" && isJumping){
+                return;
+            }
+
+            if(type === "slide" && isSliding){
+                return;
+            }
+
+            obstacle.src = "obstacle2.png";
             clearInterval(move);
             endGame();
         }
@@ -457,7 +499,7 @@ function moveObstacle(obstacle){
 
     },20);
 }
-
+    
 function checkCollision(a, b){
 
     const rect1 = a.getBoundingClientRect();
@@ -534,55 +576,20 @@ document.addEventListener("touchend", e=>{
 
 });
 
-let jumpLevel = 0;
-let isSliding = false;
-let isJumping = false;
-
 function jump(){
 
     if(gameOver) return;
-    if(jumpLevel >= 2) return;
+    if(isJumping || isSliding) return;
 
-    jumpLevel++;
+    velocityY = jumpPower;
     isJumping = true;
-
     juni.src = "juni_jump.png";
-
-    let height = parseInt(juni.style.bottom) || 0;
-    let maxHeight = jumpLevel === 1 ? 120 : 220;
-
-    let up = setInterval(()=>{
-        height += 8;
-        juni.style.bottom = height + "px";
-
-        if(height >= maxHeight){
-
-            clearInterval(up);
-
-            let down = setInterval(()=>{
-                height -= 8;
-                juni.style.bottom = height + "px";
-
-                if(height <= 0){
-                    height = 0;
-                    juni.style.bottom = "0px";
-                    jumpLevel = 0;
-                    isJumping = false;
-                    juni.src = "juni.png";
-                    clearInterval(down);
-                }
-
-            },20);
-
-        }
-
-    },20);
 }
 
 function slide(){
 
     if(gameOver) return;
-    if(isSliding) return;
+    if(isSliding || isJumping) return;
 
     isSliding = true;
 
@@ -593,7 +600,7 @@ function slide(){
         juni.src = "juni.png";
         juni.style.height = "80px";
         isSliding = false;
-    },500);
+    },600);
 }
 
 </script>
