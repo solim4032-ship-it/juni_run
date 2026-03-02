@@ -374,7 +374,7 @@ let velocityY = 0;
 let gravity = 0.6;
 let jumpPower = -14;
 let ground = 0;
-let forwardMove = 0;
+
 let isJumping = false;
 let isSliding = false;
 
@@ -387,15 +387,6 @@ function physicsLoop(){
 
     let currentBottom = parseInt(juni.style.bottom) || 0;
     currentBottom -= velocityY;
-    // 점프 중이면 앞으로 살짝 이동
-    if(isJumping){
-        forwardMove += 2;
-        juni.style.left = (100 + forwardMove) + "px";
-    }
-    else{
-        forwardMove = 0;
-        juni.style.left = "100px";
-    }
 
     if(currentBottom <= ground){
         currentBottom = ground;
