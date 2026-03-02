@@ -174,6 +174,12 @@ input{
     <button id="loginBtn" onclick="showLogin()">Login</button>
     <button onclick="openMenu()">게임하기</button>
   </div>
+
+    <button onclick="resetAllUsers()" 
+        style="position:absolute; bottom:20px; right:20px; background:#ff4d4d; color:white;">
+    유저 초기화
+</button>
+    
 </div>
 
 <!-- 로그인 -->
@@ -608,6 +614,15 @@ function slide(){
         juni.style.height = "80px";
         isSliding = false;
     },600);
+}
+
+function resetAllUsers(){
+
+    if(confirm("정말 모든 유저 데이터를 삭제하시겠습니까?")){
+        localStorage.removeItem("users");
+        alert("모든 유저 데이터가 초기화되었습니다.");
+        location.reload(); // 새로고침
+    }
 }
 
 </script>
