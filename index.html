@@ -174,12 +174,6 @@ input{
     <button id="loginBtn" onclick="showLogin()">Login</button>
     <button onclick="openMenu()">게임하기</button>
   </div>
-
-    <button onclick="resetAllUsers()" 
-        style="position:absolute; bottom:20px; right:20px; background:#ff4d4d; color:white;">
-    유저 초기화
-</button>
-    
 </div>
 
 <!-- 로그인 -->
@@ -377,10 +371,10 @@ let speed = 6;
 let obstacleInterval;
 /* ===== 물리 엔진 변수 ===== */
 let velocityY = 0;
-let gravity = 0.5;
-let jumpPower = -18;
+let gravity = 0.6;
+let jumpPower = -14;
 let ground = 0;
-
+let forwardMove = 0;
 let isJumping = false;
 let isSliding = false;
 
@@ -393,6 +387,15 @@ function physicsLoop(){
 
     let currentBottom = parseInt(juni.style.bottom) || 0;
     currentBottom -= velocityY;
+    // 점프 중이면 앞으로 살짝 이동
+    if(isJumping){
+        forwardMove += 2;
+        juni.style.left = (100 + forwardMove) + "px";
+    }
+    else{
+        forwardMove = 0;
+        juni.style.left = "100px";
+    }
 
     if(currentBottom <= ground){
         currentBottom = ground;
@@ -616,14 +619,6 @@ function slide(){
     },600);
 }
 
-function resetAllUsers(){
-
-    if(confirm("정말 모든 유저 데이터를 삭제하시겠습니까?")){
-        localStorage.removeItem("users");
-        alert("모든 유저 데이터가 초기화되었습니다.");
-        location.reload(); // 새로고침
-    }
-}
 
 </script>
 </body>
