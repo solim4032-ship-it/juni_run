@@ -583,11 +583,25 @@ function checkCollision(a, b){
     const rect1 = a.getBoundingClientRect();
     const rect2 = b.getBoundingClientRect();
 
+    // 🔥 충돌 범위 줄이기 (숫자 조절 가능)
+    const paddingX = 15;
+    const paddingY = 20;
+
+    const aLeft   = rect1.left + paddingX;
+    const aRight  = rect1.right - paddingX;
+    const aTop    = rect1.top + paddingY;
+    const aBottom = rect1.bottom - paddingY;
+
+    const bLeft   = rect2.left + paddingX;
+    const bRight  = rect2.right - paddingX;
+    const bTop    = rect2.top + paddingY;
+    const bBottom = rect2.bottom - paddingY;
+
     return !(
-        rect1.top > rect2.bottom ||
-        rect1.bottom < rect2.top ||
-        rect1.right < rect2.left ||
-        rect1.left > rect2.right
+        aTop > bBottom ||
+        aBottom < bTop ||
+        aRight < bLeft ||
+        aLeft > bRight
     );
 }
     
