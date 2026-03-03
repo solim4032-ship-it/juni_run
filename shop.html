@@ -171,11 +171,11 @@ function renderCard(item){
         removeBtn.innerText = "해제";
         removeBtn.className = "buyBtn";
         removeBtn.onclick = () => {
-            userData.equipped[item.type] = null;
-            saveData();
-            renderShop();
-        };
-
+    userData.equipped[item.type] = null;
+    saveData();
+    updateCoin();     // 코인 갱신
+    renderShop();     // 상점 다시 그리기
+};
         area.appendChild(equipBtn);
         area.appendChild(removeBtn);
 
