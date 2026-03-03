@@ -464,7 +464,7 @@ function createObstacle(){
     moveObstacle(obstacle);
 
     clearInterval(obstacleInterval);
-    let randomGap = 300 + Math.random()*400;
+    let randomGap = 400 + Math.random()*500;
     obstacleInterval = setInterval(createObstacle, randomGap);
 }
     
