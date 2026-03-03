@@ -91,23 +91,58 @@ if(!currentUser){
     alert("로그인 후 이용하세요.");
     window.location.href="index.html";
 }
-
-// 유저 데이터 초기화
-if(!users[currentUser]){
-    users[currentUser] = {
-        coin: 0,
-        skins: ["juni.png"],
-        selectedSkin: "juni.png"
-    };
+    let userData = users[currentUser];
+if(!userData.skins){ 
+    userData.skins = ["juni.png"]; 
 }
-
-// "준이"만 초기 코인 지급 (첫 로그인)
-if(currentUser === "준이" && users[currentUser].coin === 0){
-    users[currentUser].coin = 10000;
+if(!userData.selectedSkin){
+    userData.selectedSkin = "juni.png"; 
 }
+updateCoin(); 
+renderShop();
 
-let userData = users[currentUser];
+function updateCoin(){
+    document.getElementById("coinDisplay").innerText =
+    "보유 코인 : " + userData.coin; 
+}
+function renderShop(){
+    renderCard("hatCard","juni_hat1.png",100);
+    renderCard("hatCard","juni_hat2.png",100);
+    renderCard("hatCard","juni_hat3.png",100);
+    renderCard("hatCard","juni_hat4.png",100);
+    renderCard("hatCard","juni_hat5.png",100);
+    renderCard("hatCard","juni_hat6.png",100);
+    renderCard("hatCard","juni_hat7.png",100);
+    renderCard("glassCard","juni_glasses1.png",150);
+    renderCard("glassCard","juni_glasses2.png",150);
+    renderCard("clothCard","juni_cloth1.png",150);
+    renderCard("clothCard","juni_cloth2.png",150);
+}
+function renderCard(cardId, skinName, price){
+    let card = document.getElementById(cardId);
+    let area = card.querySelector(".actionArea"); area.innerHTML = "";
+if(userData.skins.includes(skinName)){
+    if(userData.selectedSkin === skinName){
+        area.innerHTML = "<div class='owned'>현재 장착중</div>";
+    }else{
+        let equipBtn = document.createElement("button"); equipBtn.innerText="장착";
+        equipBtn.className="equipBtn"; 
+        equipBtn.onclick=()=>{ 
+        userData.selectedSkin =
+    skinName;
+            saveData(); renderShop(); }; area.appendChild(equipBtn); }
+    }else{
+    let buyBtn =
+    document.createElement("button"); 
+    buyBtn.innerText="구매"; 
+    buyBtn.className="buyBtn"; 
+    buyBtn.onclick=()=>{ 
+    buySkin(skinName,price); };
 
+    area.appendChild(buyBtn); 
+  }
+}
+            
 // 아이템 정보
 const shopItems = [
     // 모자 7개
