@@ -185,9 +185,12 @@ function renderCard(item){
         area.appendChild(equipBtn);
         area.appendChild(removeBtn);
 
-        if(userData.equipped[item.type] === item.img){
-            area.innerHTML += "<div class='owned'>현재 장착중</div>";
-        }
+       if(userData.equipped[item.type] === item.img){
+    const ownedText = document.createElement("div");
+    ownedText.className = "owned";
+    ownedText.innerText = "현재 장착중";
+    area.appendChild(ownedText);
+}
 
     } else {
 
