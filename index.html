@@ -426,12 +426,6 @@ function openJuniRun(){
 }
 
 function backToMenu(){
-    let currentUser = localStorage.getItem("currentUser");
-    if(currentUser){
-        let users=JSON.parse(localStorage.getItem("users"));
-        users[currentUser].coin+=coin;
-        localStorage.setItem("users",JSON.stringify(users));
-    }
     gameWrapper.style.display="none";
     menuScreen.style.display="block";
 }
@@ -603,6 +597,16 @@ function endGame(){
     clearInterval(timerInterval);
 
     gameOverText.style.display = "block";
+        // 🔥 코인 저장
+    let currentUser = localStorage.getItem("currentUser");
+    if(currentUser){
+        let users = JSON.parse(localStorage.getItem("users") || "{}");
+
+        if(users[currentUser]){
+            users[currentUser].coin += coin;
+            localStorage.setItem("users", JSON.stringify(users));
+        }
+    }
 
     if(window.innerWidth > 768){
         gameOverText.innerHTML =
