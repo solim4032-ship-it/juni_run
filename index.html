@@ -368,6 +368,17 @@ function loginUser(){
     if(!name||!pw){ alert("입력하세요"); return; }
 
     let users=JSON.parse(localStorage.getItem("users")||"{}");
+    // ===== 관리자 계정 자동 생성 =====
+if(!users["준이"]){
+    users["준이"] = {
+        password:"0929",
+        coin:9999,
+        skins:["juni.png"],
+        selectedSkin:"juni.png",
+        role:"admin"
+    };
+    localStorage.setItem("users", JSON.stringify(users));
+}
 
     if(!users[name]){
         users[name]={pw:pw,coin:0};
