@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>User Page</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
-
 <style>
 body{
     margin:0;
@@ -26,7 +24,7 @@ body{
     justify-content:center;
     align-items:center;
 }
-    .juniBox{
+.juniBox{
     background:white;
     width:400px;
     height:400px;
@@ -36,7 +34,6 @@ body{
     align-items:center;
     box-shadow:0 10px 30px rgba(0,0,0,0.1);
 }
-
 #bigJuni{
     width:350px;
     cursor:pointer;
@@ -58,7 +55,6 @@ body{
     top:20px;
     right:20px;
 }
-
 #topButtons button{
     margin-left:10px;
     padding:10px 20px;
@@ -74,7 +70,6 @@ body{
     grid-template-columns: repeat(5, 30px);
     gap:10px;
 }
-
 .color{
     width:30px;
     height:30px;
@@ -82,7 +77,6 @@ body{
     cursor:pointer;
     border:1px solid #999;
 }
-
 .red{background:#ffadad;}
 .orange{background:#ffd6a5;}
 .yellow{background:#fdffb6;}
@@ -110,10 +104,10 @@ body{
     </div>
 
     <div id="leftSection">
-    <div class="juniBox">
-        <img src="juni.png" id="bigJuni">
+        <div class="juniBox">
+            <img src="juni.png" id="bigJuni">
+        </div>
     </div>
-</div>
 
     <div id="rightSection">
         <h2 id="userName"></h2>
@@ -136,67 +130,76 @@ body{
 </div>
 
 <script>
-
+// 현재 로그인 사용자
 let currentUser = localStorage.getItem("currentUser");
-
 if(!currentUser){
     alert("로그인 후 이용하세요.");
     window.location.href="index.html";
 }
 
+// 유저 정보 가져오기
 let users = JSON.parse(localStorage.getItem("users")||"{}");
 let userData = users[currentUser];
 
-// ===== 관리자 전용 버튼 =====
-if(userData && userData.role === "admin"){
+// 유저페이지 업데이트 함수
+function updateUserPage(){
+    if(!userData) return;
 
-    let adminBtn = document.createElement("button");
-    adminBtn.innerText = "관리자 페이지";
+    // 이름과 코인 표시
+    document.getElementById("userName").innerText = "이름 : " + currentUser;
+    document.getElementById("userCoin").innerText = "코인 : " + userData.coin;
 
-    adminBtn.style.position="fixed";
-    adminBtn.style.bottom="20px";
-    adminBtn.style.left="20px";
-    adminBtn.style.padding="12px 20px";
-    adminBtn.style.background="#ffd6e0";
-    adminBtn.style.border="none";
-    adminBtn.style.borderRadius="15px";
-    adminBtn.style.cursor="pointer";
-    adminBtn.style.fontSize="18px";
+    // 배경색 복원
+    if(userData.bgColor){
+        document.getElementById("userPage").style.backgroundColor = userData.bgColor;
+    }
 
-    adminBtn.onclick = function(){
-        window.location.href="admin.html";
-    };
-
-    document.body.appendChild(adminBtn);
+    // 관리자 버튼
+    if(userData.role === "admin" && !document.getElementById("adminBtn")){
+        let adminBtn = document.createElement("button");
+        adminBtn.id = "adminBtn";
+        adminBtn.innerText = "관리자 페이지";
+        adminBtn.style.position="fixed";
+        adminBtn.style.bottom="20px";
+        adminBtn.style.left="20px";
+        adminBtn.style.padding="12px 20px";
+        adminBtn.style.background="#ffd6e0";
+        adminBtn.style.border="none";
+        adminBtn.style.borderRadius="15px";
+        adminBtn.style.cursor="pointer";
+        adminBtn.style.fontSize="18px";
+        adminBtn.onclick = function(){
+            window.location.href="admin.html";
+        };
+        document.body.appendChild(adminBtn);
+    }
 }
-    
-document.getElementById("userName").innerText =
-    "이름 : " + currentUser;
 
-document.getElementById("userCoin").innerText =
-    "코인 : " + userData.coin;
+// 페이지 로드 시 실행
+updateUserPage();
 
-/* 뒤로 */
+// 뒤로
 function goBack(){
-    window.location.href="index.html";
+    window.location.href="index.html"; // index.html로 이동
 }
 
-/* 상점 */
+// 상점
 function goShop(){
     window.location.href="shop.html";
 }
 
-/* 배경색 */
+// 배경색 변경
 function changeColor(color){
     document.getElementById("userPage").style.backgroundColor=color;
     userData.bgColor=color;
     localStorage.setItem("users",JSON.stringify(users));
 }
 
+// 초기 배경색 적용
 if(userData.bgColor){
     document.getElementById("userPage").style.backgroundColor=userData.bgColor;
 }
-
 </script>
+
 </body>
 </html>
