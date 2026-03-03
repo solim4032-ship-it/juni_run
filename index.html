@@ -406,42 +406,6 @@ function createFloatingJunis(){
 }
 createFloatingJunis();
 
-/* ================= 로그인 ================= */
-let currentUser=null;
-
-function showLogin(){
-    startScreen.style.display="none";
-    loginScreen.style.display="flex";
-}
-
-function loginUser(){
-    let name=loginName.value.trim();
-    let pw=loginPw.value.trim();
-    if(!name||!pw){ alert("입력하세요"); return; }
-
-    let users=JSON.parse(localStorage.getItem("users")||"{}");
-    
-    if(!users[name]){
-    users[name]={
-        pw:pw,
-        coin:100,
-        skins:["juni.png"],
-        selectedSkin:"juni.png",
-        role:"user"
-    };
-}
-
-    if(users[name].pw!==pw){
-        alert("비밀번호 다름");
-        return;
-    }
-
-    localStorage.setItem("users",JSON.stringify(users));
-    currentUser=name; loginBtn.innerText="🏠"; 
-    loginBtn.onclick="user.html";
-    goHome(); 
-}
-
 function openUserScreen(){
     startScreen.style.display="none";
     userScreen.style.display="flex";
