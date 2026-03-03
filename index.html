@@ -163,6 +163,76 @@ input{
     display:none;
     text-align:center;
 }
+#userPage{
+    width:100vw;
+    height:100vh;
+    display:flex;
+    position:relative;
+}
+
+/* 왼쪽 */
+#leftSection{
+    width:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+#bigJuni{
+    width:350px;
+}
+
+/* 오른쪽 */
+#rightSection{
+    width:50%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    font-size:30px;
+}
+
+/* 상단 버튼 */
+#topButtons{
+    position:absolute;
+    top:20px;
+    right:20px;
+}
+
+#topButtons button{
+    margin-left:10px;
+    padding:10px 20px;
+}
+
+/* 색상 선택 */
+#colorPicker{
+    position:absolute;
+    bottom:20px;
+    right:20px;
+    display:grid;
+    grid-template-columns: repeat(5, 30px);
+    gap:10px;
+}
+
+.color{
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    cursor:pointer;
+    border:1px solid #999;
+}
+
+.red{background:#ff4d4d;}
+.orange{background:#ff944d;}
+.yellow{background:#ffd11a;}
+.green{background:#33cc33;}
+.lime{background:#99ff33;}
+.blue{background:#3399ff;}
+.sky{background:#66ccff;}
+.purple{background:#b366ff;}
+.pink{background:#ff66cc;}
+.white{background:#ffffff;}
+    
 </style>
 </head>
 
@@ -189,10 +259,39 @@ input{
 </div>
 
 <!-- 유저 화면 -->
-<div id="userScreen" class="screen">
-    <h1 id="welcomeText"></h1>
-    <h2 id="coinText"></h2>
-    <button onclick="goHome()">홈으로</button>
+<div id="userPage">
+
+    <!-- 오른쪽 상단 버튼 -->
+    <div id="topButtons">
+        <button onclick="goShop()">상점</button>
+        <button onclick="goBack()">뒤로</button>
+    </div>
+
+    <!-- 왼쪽 : 준이 -->
+    <div id="leftSection">
+        <img src="juni.png" id="bigJuni">
+    </div>
+
+    <!-- 오른쪽 : 유저 정보 -->
+    <div id="rightSection">
+        <h2 id="userName"></h2>
+        <h3 id="userCoin"></h3>
+    </div>
+
+    <!-- 색상 선택 -->
+    <div id="colorPicker">
+        <div class="color red" onclick="changeColor('#ff4d4d')"></div>
+        <div class="color orange" onclick="changeColor('#ff944d')"></div>
+        <div class="color yellow" onclick="changeColor('#ffd11a')"></div>
+        <div class="color green" onclick="changeColor('#33cc33')"></div>
+        <div class="color lime" onclick="changeColor('#99ff33')"></div>
+        <div class="color blue" onclick="changeColor('#3399ff')"></div>
+        <div class="color sky" onclick="changeColor('#66ccff')"></div>
+        <div class="color purple" onclick="changeColor('#b366ff')"></div>
+        <div class="color pink" onclick="changeColor('#ff66cc')"></div>
+        <div class="color white" onclick="changeColor('#ffffff')"></div>
+    </div>
+
 </div>
 
 <!-- 메뉴 -->
@@ -612,7 +711,41 @@ function slide(){
         isSliding = false;
     },600);
 }
+// 현재 로그인 유저 불러오기
+let currentUser = localStorage.getItem("currentUser");
+let users = JSON.parse(localStorage.getItem("users")) || [];
 
+let foundUser = users.find(u => u.id === currentUser);
+
+if(foundUser){
+    document.getElementById("userName").innerText = "이름 : " + foundUser.id;
+    document.getElementById("userCoin").innerText = "코인 : " + foundUser.coin;
+}
+
+// 뒤로 버튼
+function goBack(){
+    window.location.href = "index.html";
+}
+
+// 상점 버튼 (일단 이동만)
+function goShop(){
+    alert("상점은 곧 업데이트됩니다!");
+}
+
+// 배경색 변경
+function changeColor(color){
+    document.getElementById("userPage").style.backgroundColor = color;
+
+    if(foundUser){
+        foundUser.bgColor = color;
+        localStorage.setItem("users", JSON.stringify(users));
+    }
+}
+
+// 저장된 배경색 불러오기
+if(foundUser && foundUser.bgColor){
+    document.getElementById("userPage").style.backgroundColor = foundUser.bgColor;
+}
 
 </script>
 </body>
