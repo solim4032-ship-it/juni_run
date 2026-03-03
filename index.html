@@ -440,7 +440,7 @@ let obstacleInterval;
 /* ===== 물리 엔진 변수 ===== */
 let velocityY = 0;
 let gravity = 0.28;
-let jumpPower = -12;
+let jumpPower = -8;
 let ground = 0;
 
 let isJumping = false;
@@ -520,7 +520,7 @@ function createObstacle(){
     else{
         obstacle.src = "obstacle_slice.png";
         obstacle.style.height = "70px";
-        obstacle.style.bottom = "70px";
+        obstacle.style.bottom = "50px";
         obstacle.dataset.type = "slide";
     }
 
