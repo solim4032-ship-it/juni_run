@@ -280,13 +280,11 @@ input{
 </div>
 
 <script>
-
-// 페이지 로드 시 로그인 상태 체크
 window.addEventListener("load", () => {
     const currentUser = localStorage.getItem("currentUser");
     if(currentUser){
-        // 이미 로그인 되어 있으면 유저페이지로 바로 이동
-        window.location.href = "user.html";
+        // 이미 로그인 상태면 바로 유저페이지로 이동
+        window.location.replace("user.html"); // replace 사용하면 history에 안 남음
     }
 });
 
@@ -377,18 +375,7 @@ function loginUser(){
     if(!name||!pw){ alert("입력하세요"); return; }
 
     let users=JSON.parse(localStorage.getItem("users")||"{}");
-    // ===== 관리자 계정 자동 생성 =====
-if(!users["준이"]){
-    users["준이"] = {
-        password:"0929",
-        coin:9999,
-        skins:["juni.png"],
-        selectedSkin:"juni.png",
-        role:"admin"
-    };
-    localStorage.setItem("users", JSON.stringify(users));
-}
-
+    
     if(!users[name]){
     users[name]={
         pw:pw,
