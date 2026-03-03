@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Juni Shop</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+
+<style>
+body{
+    margin:0;
+    font-family:'Jua', sans-serif;
+    background:#fef6fb;
+    text-align:center;
+}
+
+h1{
+    margin-top:30px;
+}
+
+#coinDisplay{
+    font-size:22px;
+    margin-bottom:20px;
+}
+
+.shopContainer{
+    display:flex;
+    justify-content:center;
+    gap:40px;
+    margin-top:30px;
+}
+
+.skinCard{
+    background:white;
+    padding:20px;
+    width:220px;
+    border-radius:20px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+.skinCard img{
+    width:120px;
+}
+
+button{
+    margin-top:10px;
+    padding:8px 15px;
+    border:none;
+    border-radius:15px;
+    cursor:pointer;
+    font-family:'Jua', sans-serif;
+}
+
+.buyBtn{
+    background:#ffd6e0;
+}
+
+.equipBtn{
+    background:#caffbf;
+}
+
+.owned{
+    color:#888;
+    margin-top:5px;
+}
+
+.topBack{
+    position:absolute;
+    top:20px;
+    right:20px;
+}
+</style>
+</head>
+
+<body>
+
+<button class="topBack" onclick="goBack()">뒤로</button>
+
+<h1>준이 상점</h1>
+<div id="coinDisplay"></div>
+
+<div class="shopContainer">
+
+    <div class="skinCard" id="hatCard">
+        <img src="juni_hat.png">
+        <h3>모자 준이</h3>
+        <p>100 코인</p>
+        <div class="actionArea"></div>
+    </div>
+
+    <div class="skinCard" id="glassCard">
+        <img src="juni_glasses.png">
+        <h3>선글라스 준이</h3>
+        <p>150 코인</p>
+        <div class="actionArea"></div>
+    </div>
+
+</div>
+
+<script>
+
+let currentUser = localStorage.getItem("currentUser");
+let users = JSON.parse(localStorage.getItem("users")||"{}");
+
+if(!currentUser){
+    alert("로그인 후 이용하세요.");
+    window.location.href="index.html";
+}
+
+let userData = users[currentUser];
+
+if(!userData.skins){
+    userData.skins = ["juni.png"];
+}
+
+if(!userData.selectedSkin){
+    userData.selectedSkin = "juni.png";
+}
+
+updateCoin();
+renderShop();
+
+function updateCoin(){
+    document.getElementById("coinDisplay").innerText =
+        "보유 코인 : " + userData.coin;
+}
+
+function renderShop(){
+    renderCard("hatCard","juni_hat.png",100);
+    renderCard("glassCard","juni_glasses.png",150);
+}
+
+function renderCard(cardId, skinName, price){
+
+    let card = document.getElementById(cardId);
+    let area = card.querySelector(".actionArea");
+    area.innerHTML = "";
+
+    if(userData.skins.includes(skinName)){
+
+        if(userData.selectedSkin === skinName){
+            area.innerHTML = "<div class='owned'>현재 장착중</div>";
+        }else{
+            let equipBtn = document.createElement("button");
+            equipBtn.innerText="장착";
+            equipBtn.className="equipBtn";
+            equipBtn.onclick=()=>{
+                userData.selectedSkin = skinName;
+                saveData();
+                renderShop();
+            };
+            area.appendChild(equipBtn);
+        }
+
+    }else{
+
+        let buyBtn = document.createElement("button");
+        buyBtn.innerText="구매";
+        buyBtn.className="buyBtn";
+        buyBtn.onclick=()=>{
+            buySkin(skinName,price);
+        };
+
+        area.appendChild(buyBtn);
+    }
+}
+
+function buySkin(skinName, price){
+
+    if(userData.coin < price){
+        alert("코인이 부족합니다!");
+        return;
+    }
+
+    userData.coin -= price;
+    userData.skins.push(skinName);
+    saveData();
+
+    updateCoin();
+    renderShop();
+}
+
+function saveData(){
+    users[currentUser] = userData;
+    localStorage.setItem("users",JSON.stringify(users));
+}
+
+function goBack(){
+    window.location.href="user.html";
+}
+
+</script>
+
+</body>
+</html>
