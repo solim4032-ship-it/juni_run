@@ -147,6 +147,23 @@ if(!currentUser){
 let users = JSON.parse(localStorage.getItem("users")||"{}");
 let userData = users[currentUser];
 
+// ===== 관리자 전용 버튼 =====
+if(userData.role === "admin"){
+
+    let adminBtn = document.createElement("button");
+    adminBtn.innerText = "관리자 페이지";
+    adminBtn.style.position="absolute";
+    adminBtn.style.top="20px";
+    adminBtn.style.left="20px";
+    adminBtn.style.background="#ffd6e0";
+
+    adminBtn.onclick = function(){
+        window.location.href="admin.html";
+    };
+
+    document.body.appendChild(adminBtn);
+}
+    
 document.getElementById("userName").innerText =
     "이름 : " + currentUser;
 
