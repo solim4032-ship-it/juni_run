@@ -92,13 +92,20 @@ if(!currentUser){
 
 let userData = users[currentUser];
 
-// 기본 스킨 세팅
-if(!userData.skins){
-    userData.skins = ["juni.png"];
+// 🔹 내가 구매한 아이템 목록
+if(!userData.ownedItems){
+    userData.ownedItems = [];
 }
-if(!userData.selectedSkin){
-    userData.selectedSkin = "juni.png";
+
+// 🔹 현재 장착한 아이템
+if(!userData.equipped){
+    userData.equipped = {
+        hat: null,
+        glass: null,
+        cloth: null
+    };
 }
+saveData();
 
 // 아이템 배열 (모자 7개, 안경 2개, 의상 2개)
 const shopItems = [
@@ -149,26 +156,41 @@ function renderCard(item){
     const area = card.querySelector(".actionArea");
     area.innerHTML = "";
 
-    if(userData.skins.includes(item.img)){
-        if(userData.selectedSkin === item.img){
-            area.innerHTML = "<div class='owned'>현재 장착중</div>";
-        } else {
-            const equipBtn = document.createElement("button");
-            equipBtn.innerText = "장착";
-            equipBtn.className = "equipBtn";
-            equipBtn.onclick = () => {
-                userData.selectedSkin = item.img;
-                saveData();
-                renderShop();
-            };
-            area.appendChild(equipBtn);
+    if(userData.ownedItems.includes(item.img)){
+
+        const equipBtn = document.createElement("button");
+        equipBtn.innerText = "장착";
+        equipBtn.className = "equipBtn";
+        equipBtn.onclick = () => {
+            userData.equipped[item.type] = item.img;
+            saveData();
+            renderShop();
+        };
+
+        const removeBtn = document.createElement("button");
+        removeBtn.innerText = "해제";
+        removeBtn.className = "buyBtn";
+        removeBtn.onclick = () => {
+            userData.equipped[item.type] = null;
+            saveData();
+            renderShop();
+        };
+
+        area.appendChild(equipBtn);
+        area.appendChild(removeBtn);
+
+        if(userData.equipped[item.type] === item.img){
+            area.innerHTML += "<div class='owned'>현재 장착중</div>";
         }
+
     } else {
+
         const buyBtn = document.createElement("button");
         buyBtn.innerText = "구매";
         buyBtn.className = "buyBtn";
         buyBtn.onclick = () => buySkin(item.img, item.price);
         area.appendChild(buyBtn);
+
     }
 }
 
@@ -178,7 +200,7 @@ function buySkin(skinName, price){
         return;
     }
     userData.coin -= price;
-    userData.skins.push(skinName);
+    userData.ownedItems.push(skinName);
     saveData();
     updateCoin();
     renderShop();
