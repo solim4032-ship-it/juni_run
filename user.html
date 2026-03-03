@@ -37,22 +37,27 @@ body{
     box-shadow:0 10px 30px rgba(0,0,0,0.1);
 }
 #bigJuni{
-    width:350px;
-    cursor:pointer;
-}
-
-#characterWrap{
-    position:relative;
-    width:350px;
-    height:350px;
-}
-
-#characterWrap img{
     position:absolute;
     width:100%;
     left:0;
     top:0;
-    object-fit:contain;
+    z-index:1;
+}
+
+#characterWrap{
+    position:relative;
+    width:360px;
+    height:360px;
+}
+
+#hatLayer,
+#glassLayer,
+#clothLayer{
+    position:absolute;
+    width:166.66%;   /* 👈 핵심 */
+    left:-33.33%;    /* 👈 가운데 정렬 */
+    top:-33.33%;
+    z-index:2;
     pointer-events:none;
 }
 
