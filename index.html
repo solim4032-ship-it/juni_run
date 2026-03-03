@@ -283,7 +283,6 @@ input{
 /* ================= 요소 연결 ================= */
 const startScreen = document.getElementById("startScreen");
 const loginScreen = document.getElementById("loginScreen");
-const userScreen = document.getElementById("userScreen");
 const menuScreen = document.getElementById("menuScreen");
 const gameWrapper = document.getElementById("gameWrapper");
 const game = document.getElementById("game");
@@ -295,11 +294,8 @@ const welcomeText = document.getElementById("welcomeText");
 const coinText = document.getElementById("coinText");
 const loginName = document.getElementById("loginName");
 const loginPw = document.getElementById("loginPw");
-
 const startButtons = document.getElementById("startButtons");
-const loginScreen = document.getElementById("loginScreen");
-const startScreen = document.getElementById("startScreen");
-    
+
 /* ================= 로그인 ================= */
 // 페이지 로드 시 로그인 상태 확인
 window.addEventListener("load", () => {
@@ -328,6 +324,7 @@ function loginUser(){
     }
 
     localStorage.setItem("currentUser", name);
+    currentUser = name;
     loginScreen.style.display = "none";
     startScreen.style.display = "block";
 
@@ -407,20 +404,6 @@ function createFloatingJunis(){
 }
 createFloatingJunis();
 
-function openUserScreen(){
-    startScreen.style.display="none";
-    userScreen.style.display="flex";
-
-    let users=JSON.parse(localStorage.getItem("users"));
-    welcomeText.innerText=currentUser+"님 환영합니다!";
-    coinText.innerText="총 코인: "+users[currentUser].coin;
-}
-
-function goHome(){
-    loginScreen.style.display="none";
-    userScreen.style.display="none";
-    startScreen.style.display="block";
-}
 
 /* ================= 화면 전환 ================= */
 function openMenu(){
@@ -441,6 +424,7 @@ function openJuniRun(){
 }
 
 function backToMenu(){
+    let currentUser = localStorage.getItem("currentUser");
     if(currentUser){
         let users=JSON.parse(localStorage.getItem("users"));
         users[currentUser].coin+=coin;
