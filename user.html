@@ -50,14 +50,28 @@ body{
     height:600px;
 }
 
-#bigJuni,
-#hatLayer,
-#glassLayer,
+#hatLayer{
+    position:absolute;
+    width:100%;
+    left:0;
+    top:0;
+    z-index:3;   /* 👈 모자는 맨 위 */
+}
+
+#glassLayer{
+    position:absolute;
+    width:100%;
+    left:0;
+    top:0;
+    z-index:4;   /* 👈 안경은 더 위 */
+}
+
 #clothLayer{
     position:absolute;
     width:100%;
     left:0;
     top:0;
+    z-index:2;   /* 👈 옷은 중간 */
 }
     
 /* 오른쪽 */
