@@ -371,7 +371,7 @@ function loginUser(){
     // ===== 관리자 계정 자동 생성 =====
 if(!users["준이"]){
     users["준이"] = {
-        password:"0929",
+        pw:"0929",
         coin:9999,
         skins:["juni.png"],
         selectedSkin:"juni.png",
@@ -381,8 +381,14 @@ if(!users["준이"]){
 }
 
     if(!users[name]){
-        users[name]={pw:pw,coin:0};
-    }
+    users[name]={
+        pw:pw,
+        coin:0,
+        skins:["juni.png"],
+        selectedSkin:"juni.png",
+        role:"user"
+    };
+}
 
     if(users[name].pw!==pw){
         alert("비밀번호 다름");
