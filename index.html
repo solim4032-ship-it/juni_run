@@ -295,24 +295,23 @@ const welcomeText = document.getElementById("welcomeText");
 const coinText = document.getElementById("coinText");
 const loginName = document.getElementById("loginName");
 const loginPw = document.getElementById("loginPw");
-// =================== JS ===================
+
 const startButtons = document.getElementById("startButtons");
-const loginBtn = document.getElementById("loginBtn");
 const loginScreen = document.getElementById("loginScreen");
+const startScreen = document.getElementById("startScreen");
 
 // 페이지 로드 시 로그인 상태 확인
 window.addEventListener("load", () => {
     const currentUser = localStorage.getItem("currentUser");
     if(currentUser){
-        // 로그인 되어 있으면 Login 버튼을 🏠 버튼으로 교체
         showHomeButton(currentUser);
     }
 });
 
-// 로그인 성공 시
+// 로그인 성공
 function loginUser(){
-    const name = document.getElementById("loginName").value.trim();
-    const pw = document.getElementById("loginPw").value.trim();
+    const name = loginName.value.trim();
+    const pw = loginPw.value.trim();
     if(!name || !pw){ alert("입력하세요"); return; }
 
     let users = JSON.parse(localStorage.getItem("users") || "{}");
@@ -329,18 +328,19 @@ function loginUser(){
 
     localStorage.setItem("currentUser", name);
     loginScreen.style.display = "none";
+    startScreen.style.display = "block";
 
-    showHomeButton(name); // 버튼 교체
+    showHomeButton(name);
 }
 
-// 시작화면의 Login 버튼을 집 버튼으로 교체
+// 시작화면의 Login 버튼을 🏠 버튼으로 교체
 function showHomeButton(userName){
     startButtons.innerHTML = `
         <button id="homeBtn">🏠 ${userName}님</button>
+        <button onclick="openMenu()">게임하기</button>
     `;
     document.getElementById("homeBtn").onclick = () => {
-        // 유저페이지 이동
-        window.location.href = "user.html";
+        window.location.href = "user.html"; // 유저 페이지로 이동
     };
 }
 
