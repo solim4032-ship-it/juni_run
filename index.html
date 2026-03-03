@@ -280,13 +280,6 @@ input{
 </div>
 
 <script>
-window.addEventListener("load", () => {
-    const currentUser = localStorage.getItem("currentUser");
-    if(currentUser){
-        // 이미 로그인 상태면 바로 유저페이지로 이동
-        window.location.replace("user.html"); // replace 사용하면 history에 안 남음
-    }
-});
 
 /* ================= 요소 연결 ================= */
 const startScreen = document.getElementById("startScreen");
