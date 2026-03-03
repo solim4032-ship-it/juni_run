@@ -148,7 +148,7 @@ let users = JSON.parse(localStorage.getItem("users")||"{}");
 let userData = users[currentUser];
 
 // ===== 관리자 전용 버튼 =====
-if(userData.role === "admin"){
+if(userData && userData.role === "admin"){
 
     let adminBtn = document.createElement("button");
     adminBtn.innerText = "관리자 페이지";
