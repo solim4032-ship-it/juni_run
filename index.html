@@ -365,13 +365,13 @@ function showLogin(){
 function loginUser(){
     let name=loginName.value.trim();
     let pw=loginPw.value.trim();
-    if(!name||!pw){ alert("입력하세요"); return; }
+    if(!name||!password){ alert("입력하세요"); return; }
 
     let users=JSON.parse(localStorage.getItem("users")||"{}");
     // ===== 관리자 계정 자동 생성 =====
 if(!users["준이"]){
     users["준이"] = {
-        pw:"0929",
+        password:"0929",
         coin:9999,
         skins:["juni.png"],
         selectedSkin:"juni.png",
@@ -382,7 +382,7 @@ if(!users["준이"]){
 
     if(!users[name]){
     users[name]={
-        pw:pw,
+        password:password,
         coin:100,
         skins:["juni.png"],
         selectedSkin:"juni.png",
@@ -390,7 +390,7 @@ if(!users["준이"]){
     };
 }
 
-    if(users[name].pw!==pw){
+    if(users[name].password!==password){
         alert("비밀번호 다름");
         return;
     }
