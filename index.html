@@ -385,8 +385,9 @@ function loginUser(){
     }
 
     localStorage.setItem("users",JSON.stringify(users));
-    localStorage.setItem("currentUser", name);
-window.location.href = "user.html";
+    currentUser=name; loginBtn.innerText="🏠"; 
+    loginBtn.onclick="user.html";
+    goHome(); 
 }
 
 function openUserScreen(){
