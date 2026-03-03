@@ -82,70 +82,26 @@ button{
 <div class="shopContainer"></div>
 
 <script>
-// 로그인 정보 가져오기
 let currentUser = localStorage.getItem("currentUser");
 let users = JSON.parse(localStorage.getItem("users")||"{}");
 
-// 로그인 안 되어 있으면 이동
 if(!currentUser){
     alert("로그인 후 이용하세요.");
     window.location.href="index.html";
 }
-    let userData = users[currentUser];
-if(!userData.skins){ 
-    userData.skins = ["juni.png"]; 
+
+let userData = users[currentUser];
+
+// 기본 스킨 세팅
+if(!userData.skins){
+    userData.skins = ["juni.png"];
 }
 if(!userData.selectedSkin){
-    userData.selectedSkin = "juni.png"; 
+    userData.selectedSkin = "juni.png";
 }
-updateCoin(); 
-renderShop();
 
-function updateCoin(){
-    document.getElementById("coinDisplay").innerText =
-    "보유 코인 : " + userData.coin; 
-}
-function renderShop(){
-    renderCard("hatCard","juni_hat1.png",100);
-    renderCard("hatCard","juni_hat2.png",100);
-    renderCard("hatCard","juni_hat3.png",100);
-    renderCard("hatCard","juni_hat4.png",100);
-    renderCard("hatCard","juni_hat5.png",100);
-    renderCard("hatCard","juni_hat6.png",100);
-    renderCard("hatCard","juni_hat7.png",100);
-    renderCard("glassCard","juni_glasses1.png",150);
-    renderCard("glassCard","juni_glasses2.png",150);
-    renderCard("clothCard","juni_cloth1.png",150);
-    renderCard("clothCard","juni_cloth2.png",150);
-}
-function renderCard(cardId, skinName, price){
-    let card = document.getElementById(cardId);
-    let area = card.querySelector(".actionArea"); area.innerHTML = "";
-if(userData.skins.includes(skinName)){
-    if(userData.selectedSkin === skinName){
-        area.innerHTML = "<div class='owned'>현재 장착중</div>";
-    }else{
-        let equipBtn = document.createElement("button"); equipBtn.innerText="장착";
-        equipBtn.className="equipBtn"; 
-        equipBtn.onclick=()=>{ 
-        userData.selectedSkin =
-    skinName;
-            saveData(); renderShop(); }; area.appendChild(equipBtn); }
-    }else{
-    let buyBtn =
-    document.createElement("button"); 
-    buyBtn.innerText="구매"; 
-    buyBtn.className="buyBtn"; 
-    buyBtn.onclick=()=>{ 
-    buySkin(skinName,price); };
-
-    area.appendChild(buyBtn); 
-  }
-}
-            
-// 아이템 정보
+// 아이템 배열 (모자 7개, 안경 2개, 의상 2개)
 const shopItems = [
-    // 모자 7개
     {id:"hat1", name:"모자1", img:"juni_hat1.png", price:150, type:"hat"},
     {id:"hat2", name:"모자2", img:"juni_hat2.png", price:150, type:"hat"},
     {id:"hat3", name:"모자3", img:"juni_hat3.png", price:150, type:"hat"},
@@ -153,28 +109,23 @@ const shopItems = [
     {id:"hat5", name:"모자5", img:"juni_hat5.png", price:150, type:"hat"},
     {id:"hat6", name:"모자6", img:"juni_hat6.png", price:150, type:"hat"},
     {id:"hat7", name:"모자7", img:"juni_hat7.png", price:150, type:"hat"},
-
-    // 안경 2개
     {id:"glass1", name:"안경1", img:"juni_glass1.png", price:100, type:"glass"},
     {id:"glass2", name:"안경2", img:"juni_glass2.png", price:100, type:"glass"},
-
-    // 의상 2개
     {id:"cloth1", name:"의상1", img:"juni_cloth1.png", price:300, type:"cloth"},
     {id:"cloth2", name:"의상2", img:"juni_cloth2.png", price:300, type:"cloth"}
 ];
 
-// 화면 렌더링
+// 초기 화면 렌더링
 updateCoin();
 renderShop();
 
 function updateCoin(){
-    document.getElementById("coinDisplay").innerText =
-        "보유 코인 : " + userData.coin;
+    document.getElementById("coinDisplay").innerText = "보유 코인 : " + userData.coin;
 }
 
 function renderShop(){
     const container = document.querySelector(".shopContainer");
-    container.innerHTML = ""; // 초기화
+    container.innerHTML = "";
 
     shopItems.forEach(item => {
         const card = document.createElement("div");
@@ -239,7 +190,7 @@ function saveData(){
 }
 
 function goBack(){
-    window.location.href = "user.html";
+    window.location.href="user.html";
 }
 </script>
 
