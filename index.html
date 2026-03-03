@@ -519,13 +519,13 @@ function createObstacle(){
 
     if(type === "jump"){
         obstacle.src = "obstacle1.png";
-        obstacle.style.height = "55px";
+        obstacle.style.height = "60px";
         obstacle.style.bottom = "0px";
         obstacle.dataset.type = "jump";
     }
     else{
         obstacle.src = "obstacle_slice.png";
-        obstacle.style.height = "55px";
+        obstacle.style.height = "60px";
         obstacle.style.bottom = "60px";
         obstacle.dataset.type = "slide";
     }
@@ -538,7 +538,7 @@ function createObstacle(){
     moveObstacle(obstacle);
 
     clearInterval(obstacleInterval);
-    let randomGap = 500 + Math.random()*600;
+    let randomGap = 600 + Math.random()*700;
     obstacleInterval = setInterval(createObstacle, randomGap);
 }
     
