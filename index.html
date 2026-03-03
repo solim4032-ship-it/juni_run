@@ -258,13 +258,16 @@ input{
     <button onclick="goHome()">Back</button>
 </div>
 <!-- 유저 화면 --> 
-<div id="userScreen" class="screen"> 
-    <h1 id="welcomeText"></h1> 
-    <h2 id="coinText"></h2> 
-    <button onclick="goHome()">홈으로
-</button> 
-</div>
+<button id="homeBtn">🏠 홈으로</button>
 
+<script>
+// 버튼 클릭 시 실행
+document.getElementById("homeBtn").onclick = function() {
+    // 현재 사용자 유지
+    // 이미 currentUser가 localStorage에 저장되어 있다면 그대로 사용
+    window.location.href = "user.html";
+};
+</script>
 <!-- 메뉴 -->
 <div id="menuScreen">
     <button class="topBack" onclick="goStart()">뒤로</button>
