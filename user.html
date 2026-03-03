@@ -152,10 +152,16 @@ if(userData && userData.role === "admin"){
 
     let adminBtn = document.createElement("button");
     adminBtn.innerText = "관리자 페이지";
-    adminBtn.style.position="absolute";
-    adminBtn.style.top="20px";
+
+    adminBtn.style.position="fixed";
+    adminBtn.style.bottom="20px";
     adminBtn.style.left="20px";
+    adminBtn.style.padding="12px 20px";
     adminBtn.style.background="#ffd6e0";
+    adminBtn.style.border="none";
+    adminBtn.style.borderRadius="15px";
+    adminBtn.style.cursor="pointer";
+    adminBtn.style.fontSize="18px";
 
     adminBtn.onclick = function(){
         window.location.href="admin.html";
