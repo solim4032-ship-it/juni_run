@@ -97,7 +97,6 @@ button{
 </div>
 
 <script>
-
 let currentUser = localStorage.getItem("currentUser");
 let users = JSON.parse(localStorage.getItem("users")||"{}");
 
@@ -119,76 +118,98 @@ if(!userData.selectedSkin){
 updateCoin();
 renderShop();
 
+// 모든 아이템 정보
+const shopItems = [
+    // 모자 7개 (150 코인씩)
+    {id:"hat1", name:"모자1", img:"juni_hat1.png", price:150, type:"hat"},
+    {id:"hat2", name:"모자2", img:"juni_hat2.png", price:150, type:"hat"},
+    {id:"hat3", name:"모자3", img:"juni_hat3.png", price:150, type:"hat"},
+    {id:"hat4", name:"모자4", img:"juni_hat4.png", price:150, type:"hat"},
+    {id:"hat5", name:"모자5", img:"juni_hat5.png", price:150, type:"hat"},
+    {id:"hat6", name:"모자6", img:"juni_hat6.png", price:150, type:"hat"},
+    {id:"hat7", name:"모자7", img:"juni_hat7.png", price:150, type:"hat"},
+
+    // 안경 2개 (100 코인씩)
+    {id:"glass1", name:"안경1", img:"juni_glass1.png", price:100, type:"glass"},
+    {id:"glass2", name:"안경2", img:"juni_glass2.png", price:100, type:"glass"},
+
+    // 의상 2개 (300 코인씩)
+    {id:"cloth1", name:"의상1", img:"juni_cloth1.png", price:300, type:"cloth"},
+    {id:"cloth2", name:"의상2", img:"juni_cloth2.png", price:300, type:"cloth"}
+];
+    
 function updateCoin(){
     document.getElementById("coinDisplay").innerText =
         "보유 코인 : " + userData.coin;
 }
 
 function renderShop(){
-    renderCard("hatCard","juni_hat.png",100);
-    renderCard("glassCard","juni_glasses.png",150);
+    const container = document.querySelector(".shopContainer");
+    container.innerHTML = ""; // 초기화
+
+    shopItems.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "skinCard";
+        card.id = item.id;
+
+        card.innerHTML = `
+            <img src="${item.img}">
+            <h3>${item.name}</h3>
+            <p>${item.price} 코인</p>
+            <div class="actionArea"></div>
+        `;
+
+        container.appendChild(card);
+        renderCard(item);
+    });
 }
 
-function renderCard(cardId, skinName, price){
-
-    let card = document.getElementById(cardId);
-    let area = card.querySelector(".actionArea");
+function renderCard(item){
+    const card = document.getElementById(item.id);
+    const area = card.querySelector(".actionArea");
     area.innerHTML = "";
 
-    if(userData.skins.includes(skinName)){
-
-        if(userData.selectedSkin === skinName){
+    if(userData.skins.includes(item.img)){
+        if(userData.selectedSkin === item.img){
             area.innerHTML = "<div class='owned'>현재 장착중</div>";
-        }else{
-            let equipBtn = document.createElement("button");
-            equipBtn.innerText="장착";
-            equipBtn.className="equipBtn";
-            equipBtn.onclick=()=>{
-                userData.selectedSkin = skinName;
+        } else {
+            const equipBtn = document.createElement("button");
+            equipBtn.innerText = "장착";
+            equipBtn.className = "equipBtn";
+            equipBtn.onclick = () => {
+                userData.selectedSkin = item.img;
                 saveData();
                 renderShop();
             };
             area.appendChild(equipBtn);
         }
-
-    }else{
-
-        let buyBtn = document.createElement("button");
-        buyBtn.innerText="구매";
-        buyBtn.className="buyBtn";
-        buyBtn.onclick=()=>{
-            buySkin(skinName,price);
-        };
-
+    } else {
+        const buyBtn = document.createElement("button");
+        buyBtn.innerText = "구매";
+        buyBtn.className = "buyBtn";
+        buyBtn.onclick = () => buySkin(item.img, item.price);
         area.appendChild(buyBtn);
     }
 }
 
 function buySkin(skinName, price){
-
     if(userData.coin < price){
         alert("코인이 부족합니다!");
         return;
     }
-
     userData.coin -= price;
     userData.skins.push(skinName);
     saveData();
-
     updateCoin();
     renderShop();
 }
 
 function saveData(){
     users[currentUser] = userData;
-    localStorage.setItem("users",JSON.stringify(users));
+    localStorage.setItem("users", JSON.stringify(users));
 }
 
 function goBack(){
-    window.location.href="user.html";
+    window.location.href = "user.html";
 }
-
 </script>
-
-</body>
-</html>
