@@ -24,6 +24,7 @@ h1{
 
 .shopContainer{
     display:flex;
+    flex-wrap:wrap;
     justify-content:center;
     gap:40px;
     margin-top:30px;
@@ -78,49 +79,38 @@ button{
 <h1>준이 상점</h1>
 <div id="coinDisplay"></div>
 
-<div class="shopContainer">
-
-    <div class="skinCard" id="hatCard">
-        <img src="juni_hat.png">
-        <h3>모자 준이</h3>
-        <p>100 코인</p>
-        <div class="actionArea"></div>
-    </div>
-
-    <div class="skinCard" id="glassCard">
-        <img src="juni_glasses.png">
-        <h3>선글라스 준이</h3>
-        <p>150 코인</p>
-        <div class="actionArea"></div>
-    </div>
-
-</div>
+<div class="shopContainer"></div>
 
 <script>
+// 로그인 정보 가져오기
 let currentUser = localStorage.getItem("currentUser");
 let users = JSON.parse(localStorage.getItem("users")||"{}");
 
+// 로그인 안 되어 있으면 이동
 if(!currentUser){
     alert("로그인 후 이용하세요.");
     window.location.href="index.html";
 }
 
+// 유저 데이터 초기화
+if(!users[currentUser]){
+    users[currentUser] = {
+        coin: 0,
+        skins: ["juni.png"],
+        selectedSkin: "juni.png"
+    };
+}
+
+// "준이"만 초기 코인 지급 (첫 로그인)
+if(currentUser === "준이" && users[currentUser].coin === 0){
+    users[currentUser].coin = 10000;
+}
+
 let userData = users[currentUser];
 
-if(!userData.skins){
-    userData.skins = ["juni.png"];
-}
-
-if(!userData.selectedSkin){
-    userData.selectedSkin = "juni.png";
-}
-
-updateCoin();
-renderShop();
-
-// 모든 아이템 정보
+// 아이템 정보
 const shopItems = [
-    // 모자 7개 (150 코인씩)
+    // 모자 7개
     {id:"hat1", name:"모자1", img:"juni_hat1.png", price:150, type:"hat"},
     {id:"hat2", name:"모자2", img:"juni_hat2.png", price:150, type:"hat"},
     {id:"hat3", name:"모자3", img:"juni_hat3.png", price:150, type:"hat"},
@@ -129,15 +119,19 @@ const shopItems = [
     {id:"hat6", name:"모자6", img:"juni_hat6.png", price:150, type:"hat"},
     {id:"hat7", name:"모자7", img:"juni_hat7.png", price:150, type:"hat"},
 
-    // 안경 2개 (100 코인씩)
+    // 안경 2개
     {id:"glass1", name:"안경1", img:"juni_glass1.png", price:100, type:"glass"},
     {id:"glass2", name:"안경2", img:"juni_glass2.png", price:100, type:"glass"},
 
-    // 의상 2개 (300 코인씩)
+    // 의상 2개
     {id:"cloth1", name:"의상1", img:"juni_cloth1.png", price:300, type:"cloth"},
     {id:"cloth2", name:"의상2", img:"juni_cloth2.png", price:300, type:"cloth"}
 ];
-    
+
+// 화면 렌더링
+updateCoin();
+renderShop();
+
 function updateCoin(){
     document.getElementById("coinDisplay").innerText =
         "보유 코인 : " + userData.coin;
@@ -213,3 +207,6 @@ function goBack(){
     window.location.href = "user.html";
 }
 </script>
+
+</body>
+</html>
