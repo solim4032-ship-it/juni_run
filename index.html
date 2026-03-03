@@ -281,6 +281,15 @@ input{
 
 <script>
 
+// 페이지 로드 시 로그인 상태 체크
+window.addEventListener("load", () => {
+    const currentUser = localStorage.getItem("currentUser");
+    if(currentUser){
+        // 이미 로그인 되어 있으면 유저페이지로 바로 이동
+        window.location.href = "user.html";
+    }
+});
+
 /* ================= 요소 연결 ================= */
 const startScreen = document.getElementById("startScreen");
 const loginScreen = document.getElementById("loginScreen");
