@@ -445,8 +445,8 @@ let speed = 6;
 let obstacleInterval;
 /* ===== 물리 엔진 변수 ===== */
 let velocityY = 0;
-let gravity = 0.3;
-let jumpPower = -10;
+let gravity = 0.28;
+let jumpPower = -12;
 let ground = 0;
 
 let isJumping = false;
@@ -498,7 +498,10 @@ obstacleInterval = setInterval(createObstacle, 1500);
     clearInterval(timerInterval);
     timerInterval=setInterval(()=>{
     time++;
-    speed += 0.1;
+
+    if(time % 3 === 0){   // 3초마다만 증가
+        speed += 0.05;    // 증가폭도 줄이기
+    }
     scoreBoard.innerHTML=
     "Time: "+time+"s | Coin: "+coin;
 
@@ -535,7 +538,7 @@ function createObstacle(){
     moveObstacle(obstacle);
 
     clearInterval(obstacleInterval);
-    let randomGap = 400 + Math.random()*500;
+    let randomGap = 500 + Math.random()*600;
     obstacleInterval = setInterval(createObstacle, randomGap);
 }
     
@@ -568,9 +571,9 @@ function moveObstacle(obstacle){
             endGame();
         }
 
-        if(right > window.innerWidth){
+        if(right > game.offsetWidth){
 
-    coin++;   // 🔥 장애물 통과 성공
+    coin += 1;
     scoreBoard.innerHTML =
     "Time: "+time+"s | Coin: "+coin;
 
