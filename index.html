@@ -427,7 +427,7 @@ obstacleInterval = setInterval(createObstacle, 1500);
     clearInterval(timerInterval);
     timerInterval=setInterval(()=>{
     time++;
-    speed += 0.2;
+    speed += 0.1;
     scoreBoard.innerHTML=
     "Time: "+time+"s | Coin: "+coin;
 
@@ -445,14 +445,14 @@ function createObstacle(){
 
     if(type === "jump"){
         obstacle.src = "obstacle1.png";
-        obstacle.style.height = "65px";
+        obstacle.style.height = "60px";
         obstacle.style.bottom = "0px";
         obstacle.dataset.type = "jump";
     }
     else{
         obstacle.src = "obstacle_slice.png";
-        obstacle.style.height = "70px";
-        obstacle.style.bottom = "80px";
+        obstacle.style.height = "65px";
+        obstacle.style.bottom = "60px";
         obstacle.dataset.type = "slide";
     }
 
@@ -464,7 +464,7 @@ function createObstacle(){
     moveObstacle(obstacle);
 
     clearInterval(obstacleInterval);
-    let randomGap = 700 + Math.random()*800;
+    let randomGap = 300 + Math.random()*400;
     obstacleInterval = setInterval(createObstacle, randomGap);
 }
     
