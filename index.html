@@ -437,7 +437,7 @@ let speed = 6;
 let obstacleInterval;
 /* ===== 물리 엔진 변수 ===== */
 let velocityY = 0;
-let gravity = 0.35;
+let gravity = 0.40;
 let jumpPower = -14;
 let ground = 0;
 
@@ -679,7 +679,7 @@ document.addEventListener("touchend", e=>{
 function jump(){
 
     if(gameOver) return;
-    if(isJumping || isSliding) return;
+    if(isJumping) return;
 
     velocityY = jumpPower;
     isJumping = true;
@@ -695,13 +695,16 @@ function slide(){
 
     juni.src = "juni_slide.png";
     juni.style.width = "130px";   // 🔥 width만 유지
+    document.addEventListener("keyup", e=>{
 
-    setTimeout(()=>{
+    if(e.code === "ArrowDown"){
+
         juni.src = "juni.png";
-        juni.style.width = "130px";
         isSliding = false;
-    },600);
-}
+
+    }
+
+});
 
 
 </script>
