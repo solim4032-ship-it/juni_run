@@ -133,6 +133,15 @@ input{
     overflow:hidden;
 }
 
+#gameBackBtn{
+    position:absolute;
+    top:20px;
+    right:20px;
+    z-index:10;
+    padding:10px 20px;
+    font-size:18px;
+}
+
 #juni{
     width:130px;
     height:auto;   /* 🔥 비율 유지 */
@@ -270,10 +279,12 @@ input{
 <div id="gameWrapper">
     <button class="topBack" onclick="backToMenu()">뒤로</button>
     <div id="game">
-        <div id="scoreBoard">Time: 0s</div>
-        <div id="gameOverText"></div>
-        <img id="juni" src="juni.png">
-    </div>
+     <div id="game">
+    <button id="gameBackBtn" onclick="backToMenu()">뒤로</button>
+    <div id="scoreBoard">Time: 0s</div>
+    <div id="gameOverText"></div>
+    <img id="juni" src="juni.png">
+  </div>
 </div>
 
 <script>
@@ -424,8 +435,14 @@ function openJuniRun(){
 }
 
 function backToMenu(){
+
     gameWrapper.style.display="none";
     menuScreen.style.display="block";
+
+    gameOver = true;
+
+    document.querySelectorAll(".obstacle").forEach(o => o.remove());
+
 }
 
 /* ================= 게임 ================= */
