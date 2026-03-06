@@ -122,7 +122,7 @@ input{
 }
 
 #game{
-    display:none;
+    display:block;
     width:100vw;
     height:100vh;   /* 🔥 화면 전체 */
     background:url("background.png") no-repeat center center;
@@ -277,14 +277,16 @@ input{
 
 <!-- 게임 -->
 <div id="gameWrapper">
-    <button class="topBack" onclick="backToMenu()">뒤로</button>
     <div id="game">
-     <div id="game">
-    <button id="gameBackBtn" onclick="backToMenu()">뒤로</button>
-    <div id="scoreBoard">Time: 0s</div>
-    <div id="gameOverText"></div>
-    <img id="juni" src="juni.png">
-  </div>
+
+        <button id="gameBackBtn" onclick="backToMenu()">뒤로</button>
+
+        <div id="scoreBoard">Time: 0s</div>
+        <div id="gameOverText"></div>
+
+        <img id="juni" src="juni.png">
+
+    </div>
 </div>
 
 <script>
