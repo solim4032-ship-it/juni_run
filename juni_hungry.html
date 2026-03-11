@@ -14,7 +14,7 @@ overflow:hidden;
 #game{
 width:100vw;
 height:100vh;
-background:url("background.png") center/cover;
+background:url("background2.png") center/cover;
 position:relative;
 overflow:hidden;
 }
@@ -93,10 +93,10 @@ let gameOver=false
 let spawnInterval
 let timerInterval
 
-let fallSpeed=3
+let fallSpeed=1.5
 let goldenTimer=0
 
-let moveSpeed = 6
+let moveSpeed = 3
 let moveLeft = false
 let moveRight = false
 
@@ -270,7 +270,7 @@ requestAnimationFrame(gameLoop)
 
 function startGame(){
 
-spawnInterval=setInterval(createFood,900)
+spawnInterval=setInterval(createFood,1200)
 
 timerInterval=setInterval(()=>{
 
@@ -281,7 +281,7 @@ goldenTimer++
 
 if(time%10===0){
 
-fallSpeed+=0.5
+fallSpeed+=0.2
 
 }
 
