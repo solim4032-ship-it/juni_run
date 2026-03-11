@@ -271,7 +271,7 @@ input{
     <div id="menuButtons">
         <button onclick="openJuniRun()">준이런</button>
         <button>준이의 솔로탈출</button>
-        <button>준이는 배고파</button>
+        <button onclick="openJuniHungry()">준이는 배고파</button>
     </div>
 </div>
 
@@ -728,7 +728,10 @@ function slide(){
     }
 
 });
-
+    
+function openJuniHungry(){
+    window.location.href = "juni_hungry.html";
+}
 
 </script>
 </body>
