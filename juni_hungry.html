@@ -96,6 +96,10 @@ let timerInterval
 let fallSpeed=3
 let goldenTimer=0
 
+let moveSpeed = 6
+let moveLeft = false
+let moveRight = false
+
 /* ===== 음식 리스트 ===== */
 
 const goodFoods=[
@@ -169,45 +173,60 @@ foods.push(food)
 
 function updateFoods(){
 
-foods.forEach((food,index)=>{
+for(let i = foods.length-1; i >= 0; i--){
 
-let top=parseFloat(food.style.top)
+let food = foods[i]
 
-food.style.top=(top+fallSpeed)+"px"
+let top = parseFloat(food.style.top)
 
-if(checkCollision(juni,food)){
+food.style.top = (top + fallSpeed) + "px"
+
+if(checkCollision(juni, food)){
 
 if(food.dataset.type==="good"){
-
-coin+=1
-
+coin += 1
 }
-
 else if(food.dataset.type==="gold"){
-
-coin+=5
-
+coin += 5
 }
-
 else{
-
 endGame()
-
 }
 
 food.remove()
-foods.splice(index,1)
-
+foods.splice(i,1)
+continue
 }
 
-if(top>window.innerHeight){
+if(top > window.innerHeight){
 
 food.remove()
-foods.splice(index,1)
+foods.splice(i,1)
 
 }
 
-})
+}
+
+}
+
+function moveJuni(){
+
+let left = juni.offsetLeft
+let juniWidth = juni.offsetWidth
+let gameWidth = window.innerWidth
+
+if(moveLeft){
+left -= moveSpeed
+}
+
+if(moveRight){
+left += moveSpeed
+}
+
+left = Math.max(0, left)
+left = Math.min(gameWidth - juniWidth, left)
+
+juni.style.left = left + "px"
 
 }
 
@@ -236,6 +255,7 @@ function gameLoop(){
 if(!gameOver){
 
 updateFoods()
+moveJuni()
 
 score.innerHTML=
 "Coin : "+coin+" | Time : "+time
@@ -275,27 +295,32 @@ startGame()
 
 /* ===== 이동 ===== */
 
-document.addEventListener("keydown",e=>{
+document.addEventListener("keydown", e=>{
 
 if(gameOver){
 
 if(e.code==="Space") restartGame()
-
 return
 }
 
-let left=juni.offsetLeft
-
 if(e.code==="ArrowLeft"){
-
-juni.style.left=(left-25)+"px"
-
+moveLeft = true
 }
 
 if(e.code==="ArrowRight"){
+moveRight = true
+}
 
-juni.style.left=(left+25)+"px"
+})
 
+document.addEventListener("keyup", e=>{
+
+if(e.code==="ArrowLeft"){
+moveLeft = false
+}
+
+if(e.code==="ArrowRight"){
+moveRight = false
 }
 
 })
