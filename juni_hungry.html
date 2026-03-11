@@ -9,7 +9,6 @@
 body{
 margin:0;
 overflow:hidden;
-font-family:sans-serif;
 }
 
 #game{
@@ -37,9 +36,9 @@ width:60px;
 position:absolute;
 top:20px;
 left:20px;
-font-size:24px;
+font-size:26px;
 color:white;
-text-shadow:2px 2px 5px black;
+text-shadow:2px 2px 6px black;
 }
 
 #gameOver{
@@ -47,10 +46,10 @@ position:absolute;
 top:50%;
 left:50%;
 transform:translate(-50%,-50%);
-font-size:32px;
+font-size:35px;
 color:white;
 text-align:center;
-text-shadow:2px 2px 8px black;
+text-shadow:2px 2px 10px black;
 display:none;
 }
 
@@ -58,8 +57,8 @@ display:none;
 position:absolute;
 top:20px;
 right:20px;
-padding:10px 20px;
 font-size:18px;
+padding:10px 20px;
 }
 
 </style>
@@ -71,7 +70,7 @@ font-size:18px;
 
 <button id="backBtn" onclick="goBack()">뒤로</button>
 
-<div id="score">Coin : 0</div>
+<div id="score">Coin : 0 | Time : 0</div>
 
 <div id="gameOver"></div>
 
@@ -81,200 +80,293 @@ font-size:18px;
 
 <script>
 
-const game = document.getElementById("game");
-const juni = document.getElementById("juni");
-const score = document.getElementById("score");
-const gameOverText = document.getElementById("gameOver");
+const game = document.getElementById("game")
+const juni = document.getElementById("juni")
+const score = document.getElementById("score")
+const gameOverText = document.getElementById("gameOver")
 
-let foods = [];
-let coin = 0;
-let gameOver = false;
+let foods=[]
+let coin=0
+let time=0
+let gameOver=false
 
-let moveSpeed = 20;
+let spawnInterval
+let timerInterval
 
-/* ================= 음식 생성 ================= */
+let fallSpeed=3
+let goldenTimer=0
+
+/* ===== 음식 리스트 ===== */
+
+const goodFoods=[
+"food1.png",
+"food2.png",
+"food3.png",
+"food4.png",
+"food5.png",
+"food6.png"
+]
+
+const rottenFoods=[
+"rotten1.png",
+"rotten2.png",
+"rotten3.png",
+"rotten4.png"
+]
+
+/* ===== 음식 생성 ===== */
 
 function createFood(){
 
-if(gameOver) return;
+if(gameOver) return
 
-let food = document.createElement("img");
+let food=document.createElement("img")
 
-let type = Math.random() < 0.75 ? "good" : "trash";
+let type
+let img
 
-if(type==="good"){
-food.src="food.png";
+/* 골든 음식 */
+if(goldenTimer>=30){
+
+type="gold"
+img="gold.png"
+goldenTimer=0
+
 }
+
+/* 일반 음식 */
 else{
-food.src="trash.png";
-}
 
-food.className="food";
-food.style.left = Math.random()*(window.innerWidth-60)+"px";
-food.style.top = "-60px";
+let rand=Math.random()
 
-food.dataset.type = type;
+if(rand<0.7){
 
-game.appendChild(food);
+type="good"
+img=goodFoods[Math.floor(Math.random()*goodFoods.length)]
 
-foods.push(food);
+}else{
 
-fallFood(food);
+type="rotten"
+img=rottenFoods[Math.floor(Math.random()*rottenFoods.length)]
 
 }
 
-setInterval(createFood,1000);
-
-
-/* ================= 음식 떨어짐 ================= */
-
-function fallFood(food){
-
-let fall = setInterval(()=>{
-
-if(gameOver){
-clearInterval(fall);
-return;
 }
 
-let top = parseInt(food.style.top);
+food.src=img
+food.className="food"
+food.dataset.type=type
 
-food.style.top = top + 5 + "px";
+food.style.left=Math.random()*(window.innerWidth-60)+"px"
+food.style.top="-60px"
+
+game.appendChild(food)
+foods.push(food)
+
+}
+
+/* ===== 음식 이동 ===== */
+
+function updateFoods(){
+
+foods.forEach((food,index)=>{
+
+let top=parseFloat(food.style.top)
+
+food.style.top=(top+fallSpeed)+"px"
 
 if(checkCollision(juni,food)){
 
 if(food.dataset.type==="good"){
 
-coin++;
-score.innerHTML="Coin : "+coin;
+coin+=1
 
 }
+
+else if(food.dataset.type==="gold"){
+
+coin+=5
+
+}
+
 else{
 
-endGame();
+endGame()
 
 }
 
-food.remove();
-clearInterval(fall);
+food.remove()
+foods.splice(index,1)
 
 }
 
-if(top > window.innerHeight){
+if(top>window.innerHeight){
 
-food.remove();
-clearInterval(fall);
-
-}
-
-},20);
+food.remove()
+foods.splice(index,1)
 
 }
 
+})
 
-/* ================= 충돌 ================= */
+}
+
+/* ===== 충돌 ===== */
 
 function checkCollision(a,b){
 
-let r1 = a.getBoundingClientRect();
-let r2 = b.getBoundingClientRect();
+let r1=a.getBoundingClientRect()
+let r2=b.getBoundingClientRect()
 
 return !(
-r1.right < r2.left ||
-r1.left > r2.right ||
-r1.bottom < r2.top ||
-r1.top > r2.bottom
-);
+
+r1.right<r2.left ||
+r1.left>r2.right ||
+r1.bottom<r2.top ||
+r1.top>r2.bottom
+
+)
 
 }
 
+/* ===== 게임 루프 ===== */
 
-/* ================= 이동 ================= */
+function gameLoop(){
 
-document.addEventListener("keydown", e=>{
+if(!gameOver){
+
+updateFoods()
+
+score.innerHTML=
+"Coin : "+coin+" | Time : "+time
+
+}
+
+requestAnimationFrame(gameLoop)
+
+}
+
+/* ===== 음식 생성 ===== */
+
+function startGame(){
+
+spawnInterval=setInterval(createFood,900)
+
+timerInterval=setInterval(()=>{
+
+time++
+goldenTimer++
+
+/* 속도 증가 */
+
+if(time%10===0){
+
+fallSpeed+=0.5
+
+}
+
+},1000)
+
+gameLoop()
+
+}
+
+startGame()
+
+/* ===== 이동 ===== */
+
+document.addEventListener("keydown",e=>{
 
 if(gameOver){
 
-if(e.code==="Space"){
-restartGame();
+if(e.code==="Space") restartGame()
+
+return
 }
 
-return;
-}
-
-let left = juni.offsetLeft;
+let left=juni.offsetLeft
 
 if(e.code==="ArrowLeft"){
-juni.style.left = (left - moveSpeed) + "px";
+
+juni.style.left=(left-25)+"px"
+
 }
 
 if(e.code==="ArrowRight"){
-juni.style.left = (left + moveSpeed) + "px";
+
+juni.style.left=(left+25)+"px"
+
 }
 
-});
+})
 
-
-/* ================= 게임오버 ================= */
+/* ===== 게임오버 ===== */
 
 function endGame(){
 
-gameOver = true;
+gameOver=true
 
-saveCoin();
+clearInterval(spawnInterval)
+clearInterval(timerInterval)
 
-gameOverText.style.display="block";
+saveCoin()
+
+gameOverText.style.display="block"
 gameOverText.innerHTML=
-"게임 오버<br><br>스페이스바로 재시작";
+"게임 오버<br><br>스페이스바로 재시작"
 
 }
 
-
-/* ================= 코인 저장 ================= */
+/* ===== 코인 저장 ===== */
 
 function saveCoin(){
 
-let currentUser = localStorage.getItem("currentUser");
+let currentUser=localStorage.getItem("currentUser")
 
 if(currentUser){
 
-let users = JSON.parse(localStorage.getItem("users")||"{}");
+let users=JSON.parse(localStorage.getItem("users")||"{}")
 
 if(users[currentUser]){
 
-users[currentUser].coin += coin;
+users[currentUser].coin+=coin
 
-localStorage.setItem("users",JSON.stringify(users));
-
-}
+localStorage.setItem("users",JSON.stringify(users))
 
 }
 
 }
 
+}
 
-/* ================= 재시작 ================= */
+/* ===== 재시작 ===== */
 
 function restartGame(){
 
-foods.forEach(f=>f.remove());
-foods=[];
+foods.forEach(f=>f.remove())
+foods=[]
 
-coin=0;
-score.innerHTML="Coin : 0";
+coin=0
+time=0
+fallSpeed=3
+goldenTimer=0
 
-gameOver=false;
+gameOver=false
 
-gameOverText.style.display="none";
+gameOverText.style.display="none"
+
+clearInterval(spawnInterval)
+clearInterval(timerInterval)
+
+startGame()
 
 }
 
-
-/* ================= 뒤로가기 ================= */
+/* ===== 뒤로가기 ===== */
 
 function goBack(){
 
-window.location.href="index.html";
+window.location.href="index.html"
 
 }
 
